@@ -19,39 +19,39 @@
 
         <!-- Quick Stats -->
         <div class="row mb-4">
-            <div class="col-md-3 mb-3">
+            <div class="col-6 col-md-3 mb-3">
                 <div class="card border-primary">
                     <div class="card-body text-center">
-                        <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                        <i class="fas fa-users stat-icon text-primary mb-3"></i>
                         <h4 class="mb-1">{{ $stats['total_users'] }}</h4>
                         <p class="text-muted mb-0">Total Users</p>
                         <small class="text-success">{{ $stats['active_users'] }} Active</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-6 col-md-3 mb-3">
                 <div class="card border-info">
                     <div class="card-body text-center">
-                        <i class="fas fa-building fa-3x text-info mb-3"></i>
+                        <i class="fas fa-building stat-icon text-info mb-3"></i>
                         <h4 class="mb-1">{{ $stats['total_departments'] }}</h4>
                         <p class="text-muted mb-0">Departments</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-6 col-md-3 mb-3">
                 <div class="card border-warning">
                     <div class="card-body text-center">
-                        <i class="fas fa-bullseye fa-3x text-warning mb-3"></i>
+                        <i class="fas fa-bullseye stat-icon text-warning mb-3"></i>
                         <h4 class="mb-1">{{ $stats['total_objectives'] }}</h4>
                         <p class="text-muted mb-0">Total Objectives</p>
                         <small class="text-warning">{{ $stats['pending_objectives'] }} Pending</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-6 col-md-3 mb-3">
                 <div class="card border-success">
                     <div class="card-body text-center">
-                        <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                        <i class="fas fa-chart-line stat-icon text-success mb-3"></i>
                         <h4 class="mb-1">{{ $stats['total_appraisals'] }}</h4>
                         <p class="text-muted mb-0">Total Appraisals</p>
                         <small class="text-success">{{ $stats['completed_appraisals'] }} Completed</small>
@@ -59,103 +59,11 @@
                 </div>
             </div>
         </div>
-
-        <!-- Quick Access Menu -->
+        <!-- Note: Quick Access has been removed from dashboard; use the nav bar to access modules -->
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-th-large"></i> Quick Access</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- User Management -->
-                            <div class="col-12 col-md-3 mb-3">
-                                <div class="d-grid gap-2">
-                                    <a href="{{ route('users.index') }}" class="btn btn-outline-primary w-100">
-                                        <i class="fas fa-users"></i> Manage Users
-                                    </a>
-                                    <a href="{{ route('users.create') }}" class="btn btn-sm btn-primary w-100 mt-1">
-                                        <i class="fas fa-user-plus"></i> Create User
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Department Management removed (duplicate link) -->
-
-                            <!-- Objectives Management -->
-                            <div class="col-12 col-md-3 mb-3">
-                                <div class="d-grid gap-2">
-                                    <a href="{{ route('objectives.index') }}" class="btn btn-outline-warning w-100">
-                                        <i class="fas fa-bullseye"></i> All Objectives
-                                    </a>
-                                    <a href="{{ route('objectives.create') }}" class="btn btn-sm btn-warning w-100 mt-1">
-                                        <i class="fas fa-plus"></i> Create Objective
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Appraisals Management -->
-                            <div class="col-12 col-md-3 mb-3">
-                                <div class="d-grid gap-2">
-                                    <a href="{{ route('appraisals.index') }}" class="btn btn-outline-success w-100">
-                                        <i class="fas fa-chart-line"></i> All Appraisals
-                                    </a>
-                                    <a href="{{ route('appraisals.create') }}" class="btn btn-sm btn-success w-100 mt-1">
-                                        <i class="fas fa-plus"></i> Create Appraisal
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- IDPs Management -->
-                            <div class="col-12 col-md-3 mb-3">
-                                <div class="d-grid gap-2">
-                                    <a href="{{ route('idps.index') }}" class="btn btn-outline-secondary w-100">
-                                        <i class="fas fa-graduation-cap"></i> All IDPs
-                                    </a>
-                                    <a href="{{ route('idps.create') }}" class="btn btn-sm btn-secondary w-100 mt-1">
-                                        <i class="fas fa-plus"></i> Create IDP
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Reports -->
-                            <div class="col-12 col-md-3 mb-3">
-                                <div class="d-grid gap-2">
-                                    <a href="#" class="btn btn-outline-danger w-100">
-                                        <i class="fas fa-file-pdf"></i> Generate Reports
-                                    </a>
-                                    <a href="#" class="btn btn-sm btn-danger w-100 mt-1">
-                                        <i class="fas fa-download"></i> Export Data
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Audit Logs -->
-                            <div class="col-12 col-md-3 mb-3">
-                                <div class="d-grid gap-2">
-                                    <a href="#" class="btn btn-outline-dark w-100">
-                                        <i class="fas fa-history"></i> Audit Logs
-                                    </a>
-                                    <a href="#" class="btn btn-sm btn-dark w-100 mt-1">
-                                        <i class="fas fa-search"></i> Search Logs
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- System Settings -->
-                            <div class="col-12 col-md-3 mb-3">
-                                <div class="d-grid gap-2">
-                                    <a href="#" class="btn btn-outline-primary w-100">
-                                        <i class="fas fa-cog"></i> System Settings
-                                    </a>
-                                    <a href="#" class="btn btn-sm btn-primary w-100 mt-1">
-                                        <i class="fas fa-database"></i> Backup Data
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="alert alert-info">
+                    Use the navigation bar to access system modules. This dashboard shows summary information only.
                 </div>
             </div>
         </div>
@@ -390,6 +298,11 @@
     <style>
         .bg-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .stat-icon { font-size: 3rem; }
+
+        @media (max-width: 576px) {
+            .stat-icon { font-size: 1.6rem; }
         }
     </style>
 @endsection

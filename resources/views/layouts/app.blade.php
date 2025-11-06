@@ -26,62 +26,33 @@
                         <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li>
 
                         @if (auth()->user()->role === 'super_admin')
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="auditLogDropdown" role="button"
-                                    data-bs-toggle="dropdown">
-                                    <i class="fas fa-clipboard-list"></i> Audit Logs
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ route('audit-logs.index') }}">All Audit Logs</a>
-                                    </li>
-                                    <li><a class="dropdown-item" href="{{ route('audit-logs.create') }}">Create Audit
-                                            Log</a></li>
-                                </ul>
-                            </li>
-                            <!-- Super Admin Menu -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="usersDropdown" role="button"
-                                    data-bs-toggle="dropdown">
+                            <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">
                                     <i class="fas fa-users"></i> Users
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ route('users.index') }}">All Users</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('users.create') }}">Create User</a></li>
-                                </ul>
-                                <!-- Stray Create Objective link removed, Departments dropdown cleaned up -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="objDropdown" role="button"
-                                    data-bs-toggle="dropdown">
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('departments.index') }}">
+                                    <i class="fas fa-building"></i> Departments
+                                </a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('objectives.index') }}">
                                     <i class="fas fa-bullseye"></i> Objectives
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ route('objectives.index') }}">All
-                                            Objectives</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('objectives.create') }}">Create
-                                            Objective</a></li>
-                                </ul>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="appDropdown" role="button"
-                                    data-bs-toggle="dropdown">
+                            <li class="nav-item"><a class="nav-link" href="{{ route('appraisals.index') }}">
                                     <i class="fas fa-chart-line"></i> Appraisals
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ route('appraisals.index') }}">All
-                                            Appraisals</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('appraisals.create') }}">Create
-                                            Appraisal</a></li>
-                                </ul>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="idpDropdown" role="button"
-                                    data-bs-toggle="dropdown">
+                            <li class="nav-item"><a class="nav-link" href="{{ route('idps.index') }}">
                                     <i class="fas fa-graduation-cap"></i> IDPs
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ route('idps.index') }}">All IDPs</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('idps.create') }}">Create IDP</a></li>
-                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('audit-logs.index') }}">
+                                    <i class="fas fa-clipboard-list"></i> Audit Logs
+                                </a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('financial-years.index') }}">
+                                    <i class="fas fa-calendar-alt"></i> Financial Years
+                                </a>
                             </li>
                         @endif
 
@@ -125,13 +96,13 @@
                             <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">Users</a></li>
                         @endif
 
-                        @if (in_array(auth()->user()->role, ['hr_admin', 'super_admin']))
-                            <li class="nav-item"><a class="nav-link"
-                                    href="{{ route('departments.index') }}">Departments</a>
-                            </li>
-                            <li class="nav-item"><a class="nav-link"
-                                    href="{{ route('financial-years.index') }}">Financial Years</a></li>
-                        @endif
+            @if (auth()->user()->role === 'hr_admin')
+                <li class="nav-item"><a class="nav-link"
+                    href="{{ route('departments.index') }}">Departments</a>
+                </li>
+                <li class="nav-item"><a class="nav-link"
+                    href="{{ route('financial-years.index') }}">Financial Years</a></li>
+            @endif
                     @endauth
                 </ul>
                 <ul class="navbar-nav ms-auto">
