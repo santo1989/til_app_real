@@ -16,9 +16,9 @@ class SuperAdminNavTest extends TestCase
 
         $this->actingAs($user);
 
-    $response = $this->get(route('dashboard'));
+        $response = $this->get(route('dashboard'));
 
-    $response->assertStatus(200);
+        $response->assertStatus(200);
 
         // Assert presence of module links by href to avoid matching other labels like "Total Users"
         $response->assertSee('href="' . route('users.index') . '"', false);
@@ -35,9 +35,9 @@ class SuperAdminNavTest extends TestCase
 
         $this->actingAs($user);
 
-    $response = $this->get(route('dashboard'));
+        $response = $this->get(route('dashboard'));
 
-    $response->assertStatus(200);
+        $response->assertStatus(200);
 
         $response->assertDontSee('href="' . route('users.index') . '"', false);
         $response->assertDontSee('href="' . route('audit-logs.index') . '"', false);

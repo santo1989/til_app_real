@@ -14,6 +14,10 @@ use App\Models\FinancialYear;
 use App\Models\Idp;
 // SingleObjectiveRequest removed; ObjectiveSettingRequest handles single and bulk forms
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Http\RedirectResponse;
 
 /**
  * @mixin User
@@ -257,9 +261,162 @@ class ObjectiveController extends Controller
         ]);
         return redirect()->route('objectives.team')->with('success', "Objectives set for {$employee->name}.");
     }
-    public function departmentObjectives()
+    public function departmentObjectives(Request $request)
     {
-        return view('appraisal.dept_head.department_objectives');
+        /** @var User $user */
+        $user = auth()->user();
+        $activeFY = FinancialYear::getActiveName();
+
+        // Allow filtering by financial year via query string ?fy=YYYY-YY
+        $financialYear = $request->get('fy', $activeFY);
+
+        // Provide list of available FY labels for the selector
+        $years = FinancialYear::orderBy('start_date')->get()->pluck('label')->toArray();
+
+        $search = $request->get('q');
+
+        // Paginate departmental objectives for large departments
+        $objectives = Objective::with('user')
+            ->where('type', 'departmental')
+            ->where('department_id', $user->department_id)
+            ->when($financialYear, function ($q) use ($financialYear) {
+                $q->where('financial_year', $financialYear);
+            })
+            ->when($search, function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
+                  });
+            })
+            ->orderBy('id')
+            ->paginate(15);
+
+        return view('appraisal.dept_head.department_objectives', compact('objectives', 'activeFY', 'financialYear', 'years'));
+    }
+
+    /**
+     * Export departmental objectives (filtered) as CSV
+     */
+    public function departmentExport(Request $request)
+    {
+        $user = auth()->user();
+        $financialYear = $request->get('fy', FinancialYear::getActiveName());
+        $search = $request->get('q');
+
+        $query = Objective::with('user')
+            ->where('type', 'departmental')
+            ->where('department_id', $user->department_id)
+            ->when($financialYear, fn($q) => $q->where('financial_year', $financialYear))
+            ->when($search, function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+
+        $objectives = $query->orderBy('id')->get();
+
+        $filename = 'department_objectives_' . ($financialYear ?? 'all') . '_' . now()->format('Ymd') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($objectives) {
+            $out = fopen('php://output', 'w');
+            // Header
+            fputcsv($out, ['ID', 'Description', 'Owner', 'Weightage', 'Target', 'Financial Year', 'Status']);
+            foreach ($objectives as $o) {
+                fputcsv($out, [
+                    $o->id,
+                    $o->description,
+                    $o->user?->name ?? 'Department',
+                    $o->weightage,
+                    $o->target,
+                    $o->financial_year,
+                    $o->status,
+                ]);
+            }
+            fclose($out);
+        };
+
+        return Response::stream($callback, 200, $headers);
+    }
+
+    /**
+     * Bulk update selected departmental objectives. Accepts an array of IDs
+     * and applies provided attributes (weightage, status, target) to each.
+     */
+    public function departmentBulkUpdate(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:objectives,id',
+            'weightage' => 'nullable|integer|min:0|max:100',
+            'status' => 'nullable|string',
+            'target' => 'nullable|string',
+        ]);
+
+        $user = auth()->user();
+
+        // Ensure objectives belong to the user's department
+        $updated = 0;
+        $objs = Objective::whereIn('id', $data['ids'])->where('department_id', $user->department_id)->get();
+        foreach ($objs as $o) {
+            $changes = [];
+            if (isset($data['weightage'])) $changes['weightage'] = (int)$data['weightage'];
+            if (isset($data['status'])) $changes['status'] = $data['status'];
+            if (isset($data['target'])) $changes['target'] = $data['target'];
+            if (!empty($changes)) {
+                $o->update($changes);
+                $updated++;
+            }
+        }
+
+        return back()->with('success', "Bulk update applied to {$updated} objectives.");
+    }
+
+    /**
+     * Create a departmental objective inline for the current user's department.
+     * This creates objectives for each active user in the department (same as teamObjectivesStore)
+     * but scoped to the authenticated user's department and accessible to dept_head role.
+     */
+    public function departmentCreateInline(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'description' => 'required|string',
+            'weightage' => 'required|integer|in:10,15,20,25,30',
+            'target' => 'required|string',
+            'is_smart' => 'nullable|boolean',
+            'financial_year' => 'required|string',
+        ]);
+
+        $user = auth()->user();
+        $departmentUsers = User::where('department_id', $user->department_id)->where('is_active', true)->get();
+
+        foreach ($departmentUsers as $u) {
+            Objective::create([
+                'user_id' => $u->id,
+                'department_id' => $user->department_id,
+                'type' => 'departmental',
+                'description' => $data['description'],
+                'weightage' => $data['weightage'],
+                'target' => $data['target'],
+                'is_smart' => $data['is_smart'] ?? false,
+                'status' => 'set',
+                'financial_year' => $data['financial_year'],
+                'created_by' => auth()->id(),
+            ]);
+        }
+
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'departmental_objective_inline_created',
+            'details' => "Inline departmental objective created for department {$user->department_id} FY {$data['financial_year']}",
+        ]);
+
+        return back()->with('success', 'Departmental objective created for all active users in the department.');
     }
     public function boardIndex()
     {

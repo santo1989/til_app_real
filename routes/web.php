@@ -68,6 +68,10 @@ Route::middleware(['auth'])->group(function () {
         // Department Head
         Route::middleware('role:dept_head')->group(function () {
             Route::get('/department-objectives', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'departmentObjectives'])->name('objectives.department');
+            // Departmental utilities: export CSV, bulk update, inline create (dept head)
+            Route::get('/department-objectives/export', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'departmentExport'])->name('department.objectives.export');
+            Route::post('/department-objectives/bulk-update', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'departmentBulkUpdate'])->name('department.objectives.bulk_update');
+            Route::post('/department-objectives/create', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'departmentCreateInline'])->name('department.objectives.create_inline');
             Route::post('/approve-appraisal/{appraisal_id}', [App\Http\Controllers\Appraisal\AppraisalController::class, 'approve'])->name('appraisals.approve');
         });
 
@@ -147,7 +151,10 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Impersonation routes (start only allowed to super_admin)
+    // Ensure the {user} parameter is numeric so literal paths like /impersonate/stop
+    // do not get captured by the dynamic route and treated as a user id.
     Route::post('/impersonate/{user}', [App\Http\Controllers\ImpersonationController::class, 'start'])
+        ->whereNumber('user')
         ->middleware(['auth', 'role:super_admin'])->name('impersonate.start');
     Route::post('/impersonate/stop', [App\Http\Controllers\ImpersonationController::class, 'stop'])
         ->middleware('auth')->name('impersonate.stop');

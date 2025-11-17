@@ -70,8 +70,7 @@
                         @endif
 
                         @if (in_array(auth()->user()->role, ['dept_head', 'super_admin']))
-                            <li class="nav-item"><a class="nav-link"
-                                    href="{{ route('objectives.department') }}">Department
+                            <li class="nav-item"><a class="nav-link" href="{{ route('objectives.department') }}">Department
                                     Objectives</a></li>
                         @endif
 
@@ -96,13 +95,13 @@
                             <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">Users</a></li>
                         @endif
 
-            @if (auth()->user()->role === 'hr_admin')
-                <li class="nav-item"><a class="nav-link"
-                    href="{{ route('departments.index') }}">Departments</a>
-                </li>
-                <li class="nav-item"><a class="nav-link"
-                    href="{{ route('financial-years.index') }}">Financial Years</a></li>
-            @endif
+                        @if (auth()->user()->role === 'hr_admin')
+                            <li class="nav-item"><a class="nav-link"
+                                    href="{{ route('departments.index') }}">Departments</a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('financial-years.index') }}">Financial
+                                    Years</a></li>
+                        @endif
                     @endauth
                 </ul>
                 <ul class="navbar-nav ms-auto">
@@ -203,6 +202,23 @@
                     responsive: true,
                     pageLength: 25
                 });
+            });
+        });
+    </script>
+    <script>
+        // Enable Bootstrap tooltips for better affordance
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        // Confirm impersonation actions to avoid accidental switches
+        $(function() {
+            $('.impersonate-form').on('submit', function(e) {
+                var user = $(this).data('user') || 'the user';
+                if (!confirm('Start impersonating ' + user + '? You can stop impersonation via your profile menu.')) {
+                    e.preventDefault();
+                }
             });
         });
     </script>

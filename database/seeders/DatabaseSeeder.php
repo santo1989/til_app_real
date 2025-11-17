@@ -12,10 +12,10 @@ class DatabaseSeeder extends Seeder
             SuperAdminSeeder::class, // Create super admin first
             DepartmentSeeder::class,
             UserSeeder::class,
-            ObjectiveSeeder::class,
-            AppraisalSeeder::class,
-            IdpSeeder::class,
-            UsersAndDataSeeder::class
+            // ObjectiveSeeder::class,
+            // AppraisalSeeder::class,
+            // IdpSeeder::class,
+            // UsersAndDataSeeder::class
         ]);
     }
 }

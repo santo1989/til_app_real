@@ -9,7 +9,19 @@
                         <p class="text-muted mb-0">Welcome, {{ auth()->user()->name }} — quick actions and reports.</p>
                     </div>
                     <div>
-                        <a href="{{ route('users.create') }}" class="btn btn-primary">Create User</a>
+                        <div class="btn-group">
+                            <a href="{{ route('users.create') }}" class="btn btn-primary">
+                                <i class="fas fa-user-plus"></i> Create User
+                            </a>
+                            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="visually-hidden">Toggle</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Import Users (CSV)</a></li>
+                                <li><a class="dropdown-item" href="{{ route('reports.index') }}">Open Reports</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

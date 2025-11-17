@@ -9,7 +9,7 @@ class FinancialYearService
 {
     protected FinancialYear $fy;
 
-    public function __construct(FinancialYear $fy = null)
+    public function __construct(?FinancialYear $fy = null)
     {
         $this->fy = $fy ?? FinancialYear::active();
     }

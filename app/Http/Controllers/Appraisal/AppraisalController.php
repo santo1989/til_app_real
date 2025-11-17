@@ -16,6 +16,8 @@ use App\Services\PerformanceService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Requests\YearendAssessmentRequest;
 use App\Http\Requests\MidtermRevisionRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AppraisalController extends Controller
 {
@@ -687,10 +689,25 @@ class AppraisalController extends Controller
                     }
 
                     $fileName = 'signatures/' . now()->format('Ymd') . '/' . uniqid() . '.png';
-                    // final safeguard: cap at 500 KB
-                    if (strlen($finalData) <= 500 * 1024) {
-                        \Illuminate\Support\Facades\Storage::disk('public')->put($fileName, $finalData);
-                        $storePath = $fileName;
+                    // Ensure directory exists and attempt to store. Log failures to help debug null-path entries.
+                    try {
+                        $dir = dirname($fileName);
+                        if ($dir && $dir !== '.') {
+                            Storage::disk('public')->makeDirectory($dir);
+                        }
+                        // final safeguard: cap at 500 KB
+                        if (strlen($finalData) <= 500 * 1024) {
+                            $ok = Storage::disk('public')->put($fileName, $finalData);
+                            if ($ok) {
+                                $storePath = $fileName;
+                            } else {
+                                Log::error('Failed to store signature image (put returned false)', ['file' => $fileName, 'length' => strlen($finalData)]);
+                            }
+                        } else {
+                            Log::warning('Signature image exceeds max allowed size and was not stored', ['file' => $fileName, 'length' => strlen($finalData)]);
+                        }
+                    } catch (\Throwable $e) {
+                        Log::error('Exception while storing signature image', ['file' => $fileName, 'exception' => $e->getMessage()]);
                     }
                 }
             }
@@ -730,6 +747,31 @@ class AppraisalController extends Controller
             'details' => "{$role} signed appraisal #{$appraisal->id} by {$name}",
         ]);
 
+        // If an image was provided but we didn't persist it, log a warning to surface the issue.
+        if ($imageData && empty($storePath)) {
+            Log::warning('Signature image payload received but no file was stored', [
+                'appraisal_id' => $appraisal->id,
+                'role' => $role,
+                'user_id' => auth()->id(),
+                'image_length' => is_string($imageData) ? strlen($imageData) : null,
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Signature recorded.');
+    }
+
+    /**
+     * Basic HR reports dashboard.
+     * Returns a lightweight view with a few aggregate metrics so the HR/HR-admin
+     * route does not throw when requested. More detailed reports can be
+     * implemented later and placed under a reports/ directory.
+     */
+    public function reports()
+    {
+        // Basic aggregates for the HR reports landing page
+        $totalAppraisals = Appraisal::count();
+        $avgScore = Appraisal::whereNotNull('total_score')->avg('total_score');
+
+        return view('reports.index', compact('totalAppraisals', 'avgScore'));
     }
 }

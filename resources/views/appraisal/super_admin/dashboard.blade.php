@@ -94,9 +94,9 @@
                                                 class="btn btn-sm btn-light">Edit</a>
                                             @if (auth()->user()->role === 'super_admin' && $user->role !== 'super_admin')
                                                 <form method="POST" action="{{ route('impersonate.start', $user) }}"
-                                                    class="ms-2 m-0 p-0">
+                                                    class="ms-2 m-0 p-0 impersonate-form" data-user="{{ $user->name }}">
                                                     @csrf
-                                                    <button class="btn btn-sm btn-outline-primary">Impersonate</button>
+                                                    <button class="btn btn-sm btn-outline-primary" title="Act as this user">Impersonate</button>
                                                 </form>
                                             @endif
                                         </div>
@@ -299,10 +299,15 @@
         .bg-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        .stat-icon { font-size: 3rem; }
+
+        .stat-icon {
+            font-size: 3rem;
+        }
 
         @media (max-width: 576px) {
-            .stat-icon { font-size: 1.6rem; }
+            .stat-icon {
+                font-size: 1.6rem;
+            }
         }
     </style>
 @endsection
