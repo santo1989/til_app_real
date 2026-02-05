@@ -29,7 +29,7 @@
 
         @if ($canManage)
             <a href="{{ route('users.objectives.create', ['user_id' => $employee->id, 'fy' => $financialYear]) }}"
-                class="btn btn-primary mb-3">Add Objective</a>
+                class="btn btn-outline-primary mb-3">Add Objective</a>
         @endif
 
         <table class="table table-bordered">
@@ -53,17 +53,35 @@
                         <td>{{ $obj->target }}</td>
                         <td>{{ $obj->weightage }}%</td>
                         <td>{{ ucfirst($obj->status ?? 'set') }}</td>
-                        @if ($canManage)
+                        @if ($canManage || (!empty($canApprove) && $canApprove && $obj->status === 'pending'))
                             <td>
-                                <a href="{{ route('users.objectives.edit', ['user_id' => $employee->id, 'objective' => $obj->id, 'fy' => $financialYear]) }}"
-                                    class="btn btn-sm btn-secondary">Edit</a>
-                                <form
-                                    action="{{ route('users.objectives.destroy', ['user_id' => $employee->id, 'objective' => $obj->id]) }}"
-                                    method="post" class="d-inline" onsubmit="return confirm('Delete this objective?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
+                                @if ($canManage)
+                                    <a href="{{ route('users.objectives.edit', ['user_id' => $employee->id, 'objective' => $obj->id, 'fy' => $financialYear]) }}"
+                                        class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <form
+                                        action="{{ route('users.objectives.destroy', ['user_id' => $employee->id, 'objective' => $obj->id]) }}"
+                                        method="post" class="d-inline" onsubmit="return confirm('Delete this objective?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                @endif
+
+                                @if (!empty($canApprove) && $canApprove && $obj->status === 'pending')
+                                    <form action="{{ route('objectives.approve', $obj) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-outline-success"
+                                            onclick="return confirm('Approve this objective?')">Approve</button>
+                                    </form>
+
+                                    <form action="{{ route('objectives.reject', $obj) }}" method="POST"
+                                        class="d-inline reject-form">
+                                        @csrf
+                                        <input type="hidden" name="reason" class="reject-reason" value="" />
+                                        <button type="submit" class="btn btn-sm btn-outline-warning"
+                                            onclick="return handleReject(this)">Reject</button>
+                                    </form>
+                                @endif
                             </td>
                         @endif
                     </tr>
@@ -75,4 +93,15 @@
             </tbody>
         </table>
     </div>
+    <script>
+        function handleReject(btn) {
+            var reason = prompt('Please provide a reason for rejection (optional):');
+            if (reason === null) return false; // user cancelled
+            var form = btn.closest('.reject-form');
+            if (!form) return false;
+            var input = form.querySelector('.reject-reason');
+            if (input) input.value = reason;
+            return confirm('Confirm reject this objective?');
+        }
+    </script>
 @endsection

@@ -40,13 +40,19 @@
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
+        .btn-outline-primary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid transparent;
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-origin: border-box;
+            -webkit-background-clip: padding-box;
+            background-clip: padding-box;
         }
 
-        .btn-primary:hover {
+        .btn-outline-primary:hover {
             background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: #fff;
         }
     </style>
 </head>
@@ -93,7 +99,7 @@
                 </div>
 
                 <div class="d-grid gap-2 mb-3">
-                    <button type="submit" class="btn btn-primary btn-lg">Log In</button>
+                    <button type="submit" class="btn btn-outline-primary btn-lg">Log In</button>
                 </div>
 
                 <div class="text-center">

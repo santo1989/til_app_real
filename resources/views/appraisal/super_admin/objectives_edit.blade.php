@@ -8,8 +8,10 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>Edit Objective #{{ $objective->id }}</h4>
                         <div>
-                            <a href="{{ route('objectives.show', $objective) }}" class="btn btn-info btn-sm">View</a>
-                            <a href="{{ route('objectives.index') }}" class="btn btn-secondary btn-sm">Back to List</a>
+                            <x-ui.button variant="info" href="{{ route('objectives.show', $objective) }}"
+                                class="btn-sm">View</x-ui.button>
+                            <x-ui.button variant="secondary" href="{{ route('objectives.index') }}" class="btn-sm">Back to
+                                List</x-ui.button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -161,8 +163,9 @@
                             @endpush
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">Update Objective</button>
-                                <a href="{{ route('objectives.show', $objective) }}" class="btn btn-secondary">Cancel</a>
+                                <x-ui.button variant="primary" type="submit">Update Objective</x-ui.button>
+                                <x-ui.button variant="secondary"
+                                    href="{{ route('objectives.show', $objective) }}">Cancel</x-ui.button>
                             </div>
                         </form>
                     </div>

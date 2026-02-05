@@ -3,7 +3,7 @@
 @section('content')
     <div class="card">
         <div class="card-body">
-            <h5>My Objectives (2025-26)</h5>
+            <h5>My Objectives </h5>
             <form method="POST" action="{{ route('objectives.submit') }}">
                 @csrf
                 @include('components.alert')
@@ -42,7 +42,7 @@
                                         name="objectives[{{ $i }}][is_smart]" value="1"
                                         @if ($obj->is_smart) checked @endif /></td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-danger remove-row">Remove</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-row">Remove</button>
                                 </td>
                             </tr>
                         @empty
@@ -52,11 +52,11 @@
                         @endforelse
                     </tbody>
                 </table>
-                <button type="button" id="add-row" class="btn btn-sm btn-secondary">Add Objective</button>
-                <button type="submit" id="save-btn" class="btn btn-primary" disabled>Save</button>
+                <button type="button" id="add-row" class="btn btn-sm btn-outline-secondary">Add Objective</button>
+                <button type="submit" id="save-btn" class="btn btn-outline-primary" disabled>Save</button>
             </form>
             @include('appraisal.partials.smart_help', ['id' => 'is-smart-global-help'])
-            <div class="mt-2">Total objectives allowed: 3–6. Weightages must sum to 100%.</div>
+            <div class="mt-2">Total objectives allowed: 3–6. Weightages must sum to 70%.</div>
         </div>
     </div>
     <script>
@@ -75,16 +75,25 @@
                     const weight = parseInt($(this).find('select[name*="weightage"]').val(), 10);
                     if (!isNaN(weight)) total += weight;
                 });
+                // enforce count 3..6
                 if (rows.length < 3 || rows.length > 6) valid = false;
-                if (total !== 100) valid = false;
+                // enforce total 70 for individual-only page
+                if (total !== 70) valid = false;
                 $('#save-btn').prop('disabled', !valid);
-                $('#add-row').prop('disabled', rows.length >= 6);
+
+                // disable Add when we've reached max count OR total weight already equals/exceeds 70
+                const disableAdd = rows.length >= 6 || total >= 70;
+                $('#add-row').prop('disabled', disableAdd);
+
                 // toggle global help if any SMART checkbox is checked
                 const anySmart = $('#objectives-body').find('input.is-smart-checkbox:checked').length > 0;
                 $('#is-smart-global-help').toggleClass('d-none', !anySmart);
             }
 
             $('#add-row').on('click', function() {
+                // prevent adding if disabled (double-safety)
+                if ($(this).prop('disabled')) return;
+
                 $('#objectives-body').append(`
                 <tr>
                 <td>${idx+1}</td>
@@ -103,7 +112,7 @@
                 </td>
                 <td><input type="text" name="objectives[${idx}][target]" class="form-control" required /></td>
                 <td><input class="is-smart-checkbox" type="checkbox" name="objectives[${idx}][is_smart]" value="1" /></td>
-                <td><button type="button" class="btn btn-sm btn-danger remove-row">Remove</button></td>
+                <td><button type="button" class="btn btn-sm btn-outline-danger remove-row">Remove</button></td>
             </tr>
         `);
                 idx++;

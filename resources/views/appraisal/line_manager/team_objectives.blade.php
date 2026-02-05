@@ -22,16 +22,19 @@
                             <td>{{ $member->department->name ?? 'N/A' }}</td>
                             <td>{{ $member->objectives->count() }}</td>
                             <td>
-                                <a href="{{ route('objectives.show_set_for_user', $member->id) }}"
-                                    class="btn btn-sm btn-primary">Set Objectives</a>
-                                <a href="{{ route('users.objectives.index', ['user_id' => $member->id]) }}"
-                                    class="btn btn-sm btn-outline-primary">View</a>
-                                <a href="{{ route('appraisals.conduct_midterm', $member->id) }}"
-                                    class="btn btn-sm btn-secondary">Midterm</a>
-                                <a href="{{ route('appraisals.conduct_yearend', $member->id) }}"
-                                    class="btn btn-sm btn-info">Year-End</a>
-                                <a href="{{ route('appraisal.yearend.assessment', $member->id) }}"
-                                    class="btn btn-sm btn-success">Year-End Assessment</a>
+                                <x-ui.button variant="primary" href="{{ route('objectives.show_set_for_user', $member->id) }}"
+                                    class="btn-sm">Set Objectives</x-ui.button>
+                                <x-ui.button variant="primary"
+                                    href="{{ route('users.objectives.index', ['user_id' => $member->id]) }}"
+                                    class="btn-sm">View</x-ui.button>
+                                <x-ui.button variant="secondary"
+                                    href="{{ route('appraisals.conduct_midterm', $member->id) }}"
+                                    class="btn-sm">Midterm</x-ui.button>
+                                <x-ui.button variant="info" href="{{ route('appraisals.conduct_yearend', $member->id) }}"
+                                    class="btn-sm">Year-End</x-ui.button>
+                                <x-ui.button variant="success"
+                                    href="{{ route('appraisal.yearend.assessment', $member->id) }}" class="btn-sm">Year-End
+                                    Assessment</x-ui.button>
                             </td>
                         </tr>
                     @endforeach

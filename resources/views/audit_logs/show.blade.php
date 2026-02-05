@@ -25,7 +25,7 @@
                 <td>{{ $log->created_at ? $log->created_at->format('Y-m-d H:i') : '' }}</td>
             </tr>
         </table>
-        <a href="{{ route('audit-logs.edit', $log) }}" class="btn btn-warning">Edit</a>
-        <a href="{{ route('audit-logs.index') }}" class="btn btn-secondary">Back to List</a>
+        <x-ui.button variant="warning" href="{{ route('audit-logs.edit', $log) }}">Edit</x-ui.button>
+        <x-ui.button variant="secondary" href="{{ route('audit-logs.index') }}">Back to List</x-ui.button>
     </div>
 @endsection

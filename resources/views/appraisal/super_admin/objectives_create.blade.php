@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>Create Objective</h4>
-                        <a href="{{ route('objectives.index') }}" class="btn btn-secondary">Back to List</a>
+                        <x-ui.button variant="secondary" href="{{ route('objectives.index') }}">Back to List</x-ui.button>
                     </div>
                     <div class="card-body">
                         <form method="POST" action="{{ route('objectives.store') }}">
@@ -151,8 +151,9 @@
                             @endpush
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">Create Objective</button>
-                                <a href="{{ route('objectives.index') }}" class="btn btn-secondary">Cancel</a>
+                                <x-ui.button variant="primary" type="submit">Create Objective</x-ui.button>
+                                <x-ui.button variant="secondary"
+                                    href="{{ route('objectives.index') }}">Cancel</x-ui.button>
                             </div>
                         </form>
                     </div>

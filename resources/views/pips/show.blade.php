@@ -9,7 +9,7 @@
             <p><strong>Start:</strong> {{ $pip->start_date }} | <strong>End:</strong> {{ $pip->end_date }}</p>
             <p><strong>Appraisal:</strong> <a href="{{ route('appraisals.show', $pip->appraisal_id) }}">View Appraisal</a>
             </p>
-            <a href="{{ route('pips.index') }}" class="btn btn-secondary">Back</a>
+            <a href="{{ route('pips.index') }}" class="btn btn-outline-secondary">Back</a>
         </div>
     </div>
 @endsection

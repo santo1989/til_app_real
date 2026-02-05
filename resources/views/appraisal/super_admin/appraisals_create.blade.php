@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>Create Appraisal</h4>
-                        <a href="{{ route('appraisals.index') }}" class="btn btn-secondary">Back to List</a>
+                        <x-ui.button variant="secondary" href="{{ route('appraisals.index') }}">Back to List</x-ui.button>
                     </div>
                     <div class="card-body">
                         <form method="POST" action="{{ route('appraisals.store') }}">
@@ -125,8 +125,9 @@
                             </div>
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">Create Appraisal</button>
-                                <a href="{{ route('appraisals.index') }}" class="btn btn-secondary">Cancel</a>
+                                <x-ui.button variant="primary" type="submit">Create Appraisal</x-ui.button>
+                                <x-ui.button variant="secondary"
+                                    href="{{ route('appraisals.index') }}">Cancel</x-ui.button>
                             </div>
                         </form>
                     </div>

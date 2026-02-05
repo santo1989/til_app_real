@@ -57,9 +57,9 @@
             </div>
             @include('appraisal.partials.smart_help')
             <div>
-                <button type="submit" class="btn btn-primary">{{ $objective ? 'Update' : 'Create' }}</button>
+                <button type="submit" class="btn btn-outline-primary">{{ $objective ? 'Update' : 'Create' }}</button>
                 <a href="{{ route('users.objectives.index', ['user_id' => $employee->id, 'fy' => $financialYear]) }}"
-                    class="btn btn-secondary">Cancel</a>
+                    class="btn btn-outline-secondary">Cancel</a>
             </div>
         </form>
     </div>

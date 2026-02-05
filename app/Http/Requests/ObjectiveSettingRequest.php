@@ -53,10 +53,6 @@ class ObjectiveSettingRequest extends FormRequest
             if ($this->has('objectives')) {
                 $objectives = $this->input('objectives', []);
                 $total = array_sum(array_column($objectives, 'weightage'));
-                if ($total !== 100) {
-                    $v->errors()->add('objectives', 'Total weightage of all objectives must equal 100%.');
-                    return;
-                }
 
                 $deptTotal = 0;
                 $indCount = 0;
@@ -69,25 +65,42 @@ class ObjectiveSettingRequest extends FormRequest
                         $indCount++;
                     }
                 }
-
-                $configuredDeptTotal = config('appraisal.departmental_total', 30);
-                if ($deptCount > 0 && $deptTotal !== $configuredDeptTotal) {
-                    $v->errors()->add('objectives', "Total departmental (team) objectives must total {$configuredDeptTotal}% of overall weightage.");
-                }
-
-                // Enforce departmental objectives count: 2-3 when departmental objectives are present
+                // If there are departmental objectives present, keep previous behaviour:
+                // total weight of all objectives must equal 100% and departmental portion must match configured departmental total
                 if ($deptCount > 0) {
+                    $configuredDeptTotal = config('appraisal.departmental_total', 30);
+                    if ($deptTotal !== $configuredDeptTotal) {
+                        $v->errors()->add('objectives', "Total departmental (team) objectives must total {$configuredDeptTotal}% of overall weightage.");
+                    }
+
+                    if ($total !== 100) {
+                        $v->errors()->add('objectives', 'Total weightage of all objectives must equal 100%.');
+                    }
+
+                    // Enforce departmental objectives count: 2-3 when departmental objectives are present
                     $deptMin = config('appraisal.departmental_min_count', 2);
                     $deptMax = config('appraisal.departmental_max_count', 3);
                     if ($deptCount < $deptMin || $deptCount > $deptMax) {
                         $v->errors()->add('objectives', "Departmental/Team objectives must be between {$deptMin} and {$deptMax} items.");
                     }
-                }
 
-                $indMin = config('appraisal.individual_min', 3);
-                $indMax = config('appraisal.individual_max', 6);
-                if ($indCount < $indMin || $indCount > $indMax) {
-                    $v->errors()->add('objectives', "Individual objectives must be between {$indMin} and {$indMax}.");
+                    $indMin = config('appraisal.individual_min', 3);
+                    $indMax = config('appraisal.individual_max', 6);
+                    if ($indCount < $indMin || $indCount > $indMax) {
+                        $v->errors()->add('objectives', "Individual objectives must be between {$indMin} and {$indMax}.");
+                    }
+                } else {
+                    // Individual-only submissions: enforce configured total (default 70%) and individual count between 3 and 6
+                    $requiredTotal = config('appraisal.individual_total', 70);
+                    if ($total !== $requiredTotal) {
+                        $v->errors()->add('objectives', "Total weightage of individual objectives must equal {$requiredTotal}%.");
+                    }
+
+                    $indMin = config('appraisal.individual_min', 3);
+                    $indMax = config('appraisal.individual_max', 6);
+                    if ($indCount < $indMin || $indCount > $indMax) {
+                        $v->errors()->add('objectives', "Individual objectives must be between {$indMin} and {$indMax}.");
+                    }
                 }
 
                 // Validate date_of_setting is within the first month of the financial year when provided

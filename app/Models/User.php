@@ -182,6 +182,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Midterm progress entries recorded for this user.
+     */
+    public function midtermProgresses(): HasMany
+    {
+        return $this->hasMany(MidtermProgress::class);
+    }
+
+    /**
      * Check if user is super admin
      */
     public function isSuperAdmin()

@@ -92,10 +92,10 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Update User</button>
-                <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancel</a>
-                <button type="button" class="btn btn-danger float-end" onclick="if(confirm('Delete this user?'))
-                            document.getElementById('delete-form').submit()">Delete</button>
+                <x-ui.button variant="primary" type="submit">Update User</x-ui.button>
+                <x-ui.button variant="secondary" href="{{ route('users.index') }}">Cancel</x-ui.button>
+                <x-ui.button variant="danger" type="button" class="float-end" onclick="if(confirm('Delete this user?'))
+                            document.getElementById('delete-form').submit()">Delete</x-ui.button>
             </form>
 
             <form id="delete-form" method="POST" action="{{ route('users.destroy', $user) }}" class="d-none">

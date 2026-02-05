@@ -6,6 +6,7 @@ use App\Models\FinancialYear;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
+use App\Models\AuditLog;
 
 class FinancialYearController extends Controller
 {
@@ -41,6 +42,13 @@ class FinancialYearController extends Controller
         if ($fy->is_active) {
             FinancialYear::where('id', '!=', $fy->id)->update(['is_active' => false]);
         }
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'financial_year_created',
+            'table_name' => 'financial_years',
+            'record_id' => $fy->id,
+            'details' => "Financial year created: {$fy->label} (ID {$fy->id})",
+        ]);
 
         return redirect()->route('financial-years.index')->with('success', 'Financial year created successfully.');
     }
@@ -73,6 +81,13 @@ class FinancialYearController extends Controller
         if ($financialYear->is_active) {
             FinancialYear::where('id', '!=', $financialYear->id)->update(['is_active' => false]);
         }
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'financial_year_updated',
+            'table_name' => 'financial_years',
+            'record_id' => $financialYear->id,
+            'details' => "Financial year updated: {$financialYear->label} (ID {$financialYear->id})",
+        ]);
 
         return redirect()->route('financial-years.index')->with('success', 'Financial year updated successfully.');
     }
@@ -81,6 +96,13 @@ class FinancialYearController extends Controller
     {
         FinancialYear::where('id', '!=', $financialYear->id)->update(['is_active' => false]);
         $financialYear->update(['is_active' => true, 'status' => 'active']);
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'financial_year_activated',
+            'table_name' => 'financial_years',
+            'record_id' => $financialYear->id,
+            'details' => "Financial year activated: {$financialYear->label} (ID {$financialYear->id})",
+        ]);
 
         return redirect()->route('financial-years.index')->with('success', "Financial year {$financialYear->label} is now active.");
     }
@@ -88,6 +110,13 @@ class FinancialYearController extends Controller
     public function close(FinancialYear $financialYear)
     {
         $financialYear->update(['is_active' => false, 'status' => 'closed']);
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'financial_year_closed',
+            'table_name' => 'financial_years',
+            'record_id' => $financialYear->id,
+            'details' => "Financial year closed: {$financialYear->label} (ID {$financialYear->id})",
+        ]);
 
         return redirect()->route('financial-years.index')->with('success', "Financial year {$financialYear->label} has been closed.");
     }
@@ -98,7 +127,16 @@ class FinancialYearController extends Controller
             return back()->withErrors(['error' => 'Cannot delete the active financial year.']);
         }
 
+        $fyId = $financialYear->id;
+        $fyLabel = $financialYear->label;
         $financialYear->delete();
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'financial_year_deleted',
+            'table_name' => 'financial_years',
+            'record_id' => $fyId,
+            'details' => "Financial year deleted: {$fyLabel} (ID {$fyId})",
+        ]);
 
         return redirect()->route('financial-years.index')->with('success', 'Financial year deleted successfully.');
     }

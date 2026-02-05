@@ -10,10 +10,10 @@
                     </div>
                     <div>
                         <div class="btn-group">
-                            <a href="{{ route('users.create') }}" class="btn btn-primary">
+                            <a href="{{ route('users.create') }}" class="btn btn-outline-primary">
                                 <i class="fas fa-user-plus"></i> Create User
                             </a>
-                            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                            <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split"
                                 data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="visually-hidden">Toggle</span>
                             </button>
@@ -54,6 +54,16 @@
                     <h5>Reports</h5>
                     <p class="text-muted">Generate standard HR reports</p>
                     <a href="{{ route('reports.index') }}" class="btn btn-sm btn-outline-success">Open Reports</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>Total IDPs</h5>
+                    <h3>{{ $stats['total_idps'] ?? '—' }}</h3>
+                    <p class="text-muted">Individual Development Plans</p>
+                    <a href="{{ route('idps.index') }}" class="btn btn-sm btn-outline-info">Manage IDPs</a>
                 </div>
             </div>
         </div>

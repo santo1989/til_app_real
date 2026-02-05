@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Performance Appraisal') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -14,9 +15,12 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">TIL Appraisals</a>
+            <a class="navbar-brand d-flex align-items-center" href="{{ route('dashboard') }}">
+                <i class="fas fa-clipboard-check me-2"></i>
+                <span>{{ config('app.name', 'TIL Appraisals') }}</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -25,83 +29,80 @@
                     @auth
                         <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li>
 
-                        @if (auth()->user()->role === 'super_admin')
-                            <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">
-                                    <i class="fas fa-users"></i> Users
-                                </a>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('departments.index') }}">
-                                    <i class="fas fa-building"></i> Departments
-                                </a>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('objectives.index') }}">
-                                    <i class="fas fa-bullseye"></i> Objectives
-                                </a>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('appraisals.index') }}">
-                                    <i class="fas fa-chart-line"></i> Appraisals
-                                </a>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('idps.index') }}">
-                                    <i class="fas fa-graduation-cap"></i> IDPs
-                                </a>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('audit-logs.index') }}">
-                                    <i class="fas fa-clipboard-list"></i> Audit Logs
-                                </a>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('financial-years.index') }}">
-                                    <i class="fas fa-calendar-alt"></i> Financial Years
-                                </a>
-                            </li>
-                        @endif
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="appraisalDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-clipboard-list me-1"></i> Appraisal
+                            </a>
+                            <ul class="dropdown-menu">
+                                @can('view', auth()->user())
+                                    <li><a class="dropdown-item" href="{{ route('objectives.my') }}"><i
+                                                class="fas fa-user-check me-2"></i>My Objectives</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('appraisals.midterm') }}"><i
+                                                class="fas fa-calendar-check me-2"></i>Midterm</a></li>
+                                    @if (auth()->user()->role === 'employee')
+                                        <li><a class="dropdown-item" href="{{ route('appraisal.employee.tabs') }}"><i
+                                                    class="fas fa-columns me-2"></i>Employee Appraisal (Tabs)</a></li>
+                                    @endif
+                                @endcan
 
-                        @if (in_array(auth()->user()->role, ['employee', 'super_admin']))
-                            <li class="nav-item"><a class="nav-link" href="{{ route('objectives.my') }}">My Objectives</a>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('appraisals.midterm') }}">Midterm</a>
-                            </li>
-                        @endif
+                                @can('viewMidterm', auth()->user())
+                                    <li><a class="dropdown-item" href="{{ route('objectives.team') }}"><i
+                                                class="fas fa-users-cog me-2"></i>Team Objectives</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('objectives.approvals') }}"><i
+                                                class="fas fa-check-double me-2"></i>Approvals</a></li>
+                                    <li><a class="dropdown-item"
+                                            href="{{ route('idps.index', ['manager_id' => auth()->id()]) }}"><i
+                                                class="fas fa-graduation-cap me-2"></i>Team IDPs</a></li>
+                                @endcan
 
-                        @if (in_array(auth()->user()->role, ['line_manager', 'super_admin']))
-                            <li class="nav-item"><a class="nav-link" href="{{ route('objectives.team') }}">Team
-                                    Objectives</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">Conduct Reviews</a></li>
-                        @endif
+                                @can('viewAny', App\Models\Objective::class)
+                                    <li><a class="dropdown-item" href="{{ route('objectives.department') }}"><i
+                                                class="fas fa-building me-2"></i>Department Objectives</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('objectives.board.index') }}"><i
+                                                class="fas fa-layer-group me-2"></i>Set Departmental Objectives</a></li>
+                                @endcan
 
-                        @if (in_array(auth()->user()->role, ['dept_head', 'super_admin']))
-                            <li class="nav-item"><a class="nav-link" href="{{ route('objectives.department') }}">Department
-                                    Objectives</a></li>
-                        @endif
+                                @can('viewAny', App\Models\Idp::class)
+                                    <li><a class="dropdown-item" href="{{ route('idps.index') }}"><i
+                                                class="fas fa-graduation-cap me-2"></i>IDPs</a></li>
+                                @endcan
 
-                        @if (in_array(auth()->user()->role, ['board', 'super_admin']))
-                            <li class="nav-item"><a class="nav-link" href="{{ route('objectives.board.index') }}">Set
-                                    Departmental Objectives</a></li>
-                        @endif
+                                @can('viewAny', App\Models\Appraisal::class)
+                                    <li><a class="dropdown-item" href="{{ route('appraisals.index') }}"><i
+                                                class="fas fa-chart-line me-2"></i>Appraisals</a></li>
+                                @endcan
 
-                        @if (auth()->user()->role === 'hr_admin')
+                                @can('viewAny', App\Models\AuditLog::class)
+                                    <li><a class="dropdown-item" href="{{ route('audit-logs.index') }}"><i
+                                                class="fas fa-clipboard-list me-2"></i>Audit Logs</a></li>
+                                @endcan
+                            </ul>
+                        </li>
+
+                        @can('viewAny', App\Models\Department::class)
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="auditLogDropdown" role="button"
-                                    data-bs-toggle="dropdown">
-                                    <i class="fas fa-clipboard-list"></i> Audit Logs
+                                <a class="nav-link dropdown-toggle" href="#" id="hrDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-briefcase me-1"></i> HR
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ route('audit-logs.index') }}">All Audit
-                                            Logs</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('audit-logs.create') }}">Create Audit
-                                            Log</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('users.index') }}"><i
+                                                class="fas fa-users me-2"></i>Users</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('departments.index') }}"><i
+                                                class="fas fa-building me-2"></i>Departments</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('financial-years.index') }}"><i
+                                                class="fas fa-calendar-alt me-2"></i>Financial Years</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="{{ route('audit-logs.index') }}"><i
+                                                class="fas fa-clipboard-list me-2"></i>All Audit Logs</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('audit-logs.create') }}"><i
+                                                class="fas fa-plus me-2"></i>Create Audit Log</a></li>
                                 </ul>
                             </li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">Users</a></li>
-                        @endif
-
-                        @if (auth()->user()->role === 'hr_admin')
-                            <li class="nav-item"><a class="nav-link"
-                                    href="{{ route('departments.index') }}">Departments</a>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('financial-years.index') }}">Financial
-                                    Years</a></li>
-                        @endif
+                        @endcan
                     @endauth
                 </ul>
                 <ul class="navbar-nav ms-auto">
@@ -109,13 +110,13 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-bs-toggle="dropdown">
-                                @if (auth()->user()->role === 'super_admin')
+                                @if (auth()->user()->isSuperAdmin())
                                     <i class="fas fa-user-shield text-danger"></i>
                                 @else
                                     <i class="fas fa-user"></i>
                                 @endif
                                 {{ auth()->user()->name }}
-                                @if (auth()->user()->role === 'super_admin')
+                                @if (auth()->user()->isSuperAdmin())
                                     <span class="badge bg-danger">Super Admin</span>
                                 @endif
                             </a>
@@ -176,7 +177,7 @@
                 <div>
                     <form method="POST" action="{{ route('impersonate.stop') }}" class="m-0">
                         @csrf
-                        <button class="btn btn-sm btn-danger">Stop Impersonation</button>
+                        <button class="btn btn-sm btn-outline-danger">Stop Impersonation</button>
                     </form>
                 </div>
             </div>
@@ -216,7 +217,8 @@
         $(function() {
             $('.impersonate-form').on('submit', function(e) {
                 var user = $(this).data('user') || 'the user';
-                if (!confirm('Start impersonating ' + user + '? You can stop impersonation via your profile menu.')) {
+                if (!confirm('Start impersonating ' + user +
+                        '? You can stop impersonation via your profile menu.')) {
                     e.preventDefault();
                 }
             });

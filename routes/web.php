@@ -38,11 +38,23 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/year-end-self-assessment', [App\Http\Controllers\Appraisal\AppraisalController::class, 'yearEndIndex'])->name('appraisals.yearend');
             Route::post('/year-end-self-assessment', [App\Http\Controllers\Appraisal\AppraisalController::class, 'yearEndSubmit'])->name('appraisals.yearend.submit');
             Route::resource('idp', App\Http\Controllers\Appraisal\IdpController::class)->only(['index', 'edit', 'store', 'update']);
+            // Developer preview route for unified tabbed UI (non-invasive)
+            Route::get('/employee/appraisal-tabs', function () {
+                $user = auth()->user();
+                $objectives = $user ? $user->objectives()->get() : collect();
+                return view('appraisal.employee.tabs', compact('objectives'));
+            })->name('appraisal.employee.tabs');
         });
 
         // Line Manager routes
         Route::middleware('role:line_manager')->group(function () {
             Route::get('/team-objectives', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'teamObjectives'])->name('objectives.team');
+            // Approvals: pending objectives from direct reports
+            Route::get('/approvals', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'approvals'])->name('objectives.approvals');
+            Route::post('/approvals/bulk-approve', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'bulkApprove'])->name('objectives.bulk_approve');
+            Route::post('/approvals/bulk-reject', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'bulkReject'])->name('objectives.bulk_reject');
+            Route::post('/approvals/midterm', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'storeMidterm'])->name('objectives.midterm.store');
+            Route::get('/approvals/midterm/{user}', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'getLatestMidterm'])->name('objectives.midterm.latest');
             Route::get('/set-objectives/{user_id}', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'showSetForUser'])->name('objectives.show_set_for_user');
             Route::post('/set-objectives/{user_id}', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'setForUser'])->name('objectives.set_for_user');
             Route::get('/conduct-midterm/{user_id}', [App\Http\Controllers\Appraisal\AppraisalController::class, 'conductMidterm'])->name('appraisals.conduct_midterm');
@@ -87,6 +99,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/users/{user_id}/objectives/{objective}/edit', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'editForUser'])->name('users.objectives.edit');
         Route::put('/users/{user_id}/objectives/{objective}', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'updateForUser'])->name('users.objectives.update')->middleware('block.after.9th');
         Route::delete('/users/{user_id}/objectives/{objective}', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'destroyForUser'])->name('users.objectives.destroy')->middleware('block.after.9th');
+
+        // Approval endpoints: line managers (for their reports), HR and super admins can approve/reject pending objectives
+        Route::post('/objectives/{objective}/approve', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'approve'])->name('objectives.approve');
+        Route::post('/objectives/{objective}/reject', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'reject'])->name('objectives.reject');
+
+        // IDP approval: line managers, HR, and super admins may approve employee IDPs
+        Route::post('/idps/{idp}/approve', [App\Http\Controllers\Appraisal\IdpController::class, 'approve'])
+            ->name('idps.approve')
+            ->middleware('role:line_manager,hr_admin,super_admin');
+
+        // Milestone attainment marking (attainment + visible demonstration + HR input)
+        Route::post('idps/{idp}/milestones/{milestone}/attain', [App\Http\Controllers\Appraisal\IdpMilestoneController::class, 'attain'])
+            ->name('idps.milestones.attain')
+            ->middleware('role:line_manager,hr_admin,super_admin');
 
         // PDF Generation Routes (accessible to employee, line manager, HR, super admin)
         Route::get('/users/{user_id}/objectives/pdf', [App\Http\Controllers\Appraisal\ObjectiveController::class, 'generatePDF'])->name('users.objectives.pdf');

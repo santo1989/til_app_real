@@ -9,9 +9,9 @@
                         <h4 class="mb-0">
                             <i class="fas fa-user-edit"></i> Edit Profile
                         </h4>
-                        <a href="{{ route('profile.show') }}" class="btn btn-light btn-sm">
+                        <x-ui.button variant="light" href="{{ route('profile.show') }}" class="btn-sm">
                             <i class="fas fa-arrow-left"></i> Back to Profile
-                        </a>
+                        </x-ui.button>
                     </div>
                     <div class="card-body">
                         <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
@@ -129,12 +129,12 @@
                             </div>
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">
+                                <x-ui.button variant="primary" type="submit">
                                     <i class="fas fa-save"></i> Update Profile
-                                </button>
-                                <a href="{{ route('profile.show') }}" class="btn btn-secondary">
+                                </x-ui.button>
+                                <x-ui.button variant="secondary" href="{{ route('profile.show') }}">
                                     <i class="fas fa-times"></i> Cancel
-                                </a>
+                                </x-ui.button>
                             </div>
                         </form>
                     </div>

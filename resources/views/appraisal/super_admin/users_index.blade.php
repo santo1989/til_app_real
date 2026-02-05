@@ -41,7 +41,8 @@
                             @endif
                         </td>
                         <td>
-                            <a class="btn btn-sm btn-secondary" href="{{ route('users.edit', $u) }}">Edit</a>
+                            <x-ui.button variant="secondary" href="{{ route('users.edit', $u) }}"
+                                class="btn-sm">Edit</x-ui.button>
                         </td>
                     </tr>
                 @endforeach

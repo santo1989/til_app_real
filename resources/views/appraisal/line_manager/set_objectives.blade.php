@@ -69,9 +69,9 @@
                     </tbody>
                 </table>
 
-                <button type="button" id="add-row" class="btn btn-sm btn-secondary">Add Objective</button>
-                <button type="submit" class="btn btn-primary">Save Objectives</button>
-                <a href="{{ route('objectives.team') }}" class="btn btn-secondary">Cancel</a>
+                <x-ui.button variant="secondary" type="button" id="add-row" class="btn-sm">Add Objective</x-ui.button>
+                <x-ui.button variant="primary" type="submit">Save Objectives</x-ui.button>
+                <x-ui.button variant="secondary" href="{{ route('objectives.team') }}">Cancel</x-ui.button>
 
                 <div class="mt-2 text-muted">
                     <small>Total objectives: 2–6 | Weightages must sum to 100% | Allowed: 10%, 15%, 20%, 25%</small>

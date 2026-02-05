@@ -37,8 +37,8 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Update IDP</button>
-                <a href="{{ route('idp.index') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-outline-primary">Update IDP</button>
+                <a href="{{ route('idp.index') }}" class="btn btn-outline-secondary">Cancel</a>
             </form>
             @include('appraisal.idp.partials.milestones', ['idp' => $idp])
         </div>

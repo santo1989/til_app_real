@@ -24,7 +24,7 @@
                         @endforeach
                     </tbody>
                 </table>
-                <button class="btn btn-primary">Set Objectives</button>
+                <x-ui.button variant="primary" type="submit">Set Objectives</x-ui.button>
             </form>
         </div>
     </div>

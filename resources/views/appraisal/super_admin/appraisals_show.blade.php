@@ -8,13 +8,15 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>Appraisal Details #{{ $appraisal->id }}</h4>
                         <div>
-                            <a href="{{ route('appraisals.edit', $appraisal) }}" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="{{ route('appraisals.index') }}" class="btn btn-secondary btn-sm">Back to List</a>
+                            <x-ui.button variant="warning" href="{{ route('appraisals.edit', $appraisal) }}"
+                                class="btn-sm">Edit</x-ui.button>
+                            <x-ui.button variant="secondary" href="{{ route('appraisals.index') }}" class="btn-sm">Back to
+                                List</x-ui.button>
                             <form action="{{ route('appraisals.destroy', $appraisal) }}" method="POST" class="d-inline"
                                 onsubmit="return confirm('Are you sure you want to delete this appraisal?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                <x-ui.button variant="danger" type="submit" class="btn-sm">Delete</x-ui.button>
                             </form>
                         </div>
                     </div>
@@ -81,6 +83,67 @@
                                         <i class="fas fa-check-circle text-success"></i> Yes
                                     @else
                                         <i class="fas fa-times-circle text-danger"></i> No
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Employee Signature</th>
+                                <td>
+                                    @if (!empty($appraisal->employee_signature_path))
+                                        <img src="{{ asset('storage/' . $appraisal->employee_signature_path) }}"
+                                            alt="Employee Signature" style="max-width:300px; max-height:100px;" />
+                                        <div class="small text-muted">{{ $appraisal->employee_signed_by_name ?? '' }} -
+                                            {{ optional($appraisal->employee_signed_at)->format('d M, Y') ?? '' }}</div>
+                                    @elseif($appraisal->signed_by_employee)
+                                        <div>Signed (no image): {{ $appraisal->employee_signed_by_name ?? 'Employee' }}
+                                        </div>
+                                    @else
+                                        <div class="text-muted">Not signed</div>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Manager Signature</th>
+                                <td>
+                                    @if (!empty($appraisal->manager_signature_path))
+                                        <img src="{{ asset('storage/' . $appraisal->manager_signature_path) }}"
+                                            alt="Manager Signature" style="max-width:300px; max-height:100px;" />
+                                        <div class="small text-muted">{{ $appraisal->manager_signed_by_name ?? '' }} -
+                                            {{ optional($appraisal->manager_signed_at)->format('d M, Y') ?? '' }}</div>
+                                    @elseif($appraisal->signed_by_manager)
+                                        <div>Signed (no image): {{ $appraisal->manager_signed_by_name ?? 'Manager' }}</div>
+                                    @else
+                                        <div class="text-muted">Not signed</div>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Supervisor Signature</th>
+                                <td>
+                                    @if (!empty($appraisal->supervisor_signature_path))
+                                        <img src="{{ asset('storage/' . $appraisal->supervisor_signature_path) }}"
+                                            alt="Supervisor Signature" style="max-width:300px; max-height:100px;" />
+                                        <div class="small text-muted">{{ $appraisal->supervisor_signed_by_name ?? '' }} -
+                                            {{ optional($appraisal->supervisor_signed_at)->format('d M, Y') ?? '' }}</div>
+                                    @elseif($appraisal->supervisor_signed_by_name)
+                                        <div>Signed (no image): {{ $appraisal->supervisor_signed_by_name }}</div>
+                                    @else
+                                        <div class="text-muted">Not signed</div>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>HR Signature</th>
+                                <td>
+                                    @if (!empty($appraisal->hr_signature_path))
+                                        <img src="{{ asset('storage/' . $appraisal->hr_signature_path) }}"
+                                            alt="HR Signature" style="max-width:300px; max-height:100px;" />
+                                        <div class="small text-muted">{{ $appraisal->hr_signed_by_name ?? '' }} -
+                                            {{ optional($appraisal->hr_signed_at)->format('d M, Y') ?? '' }}</div>
+                                    @elseif($appraisal->signed_by_hr)
+                                        <div>Signed (no image): {{ $appraisal->hr_signed_by_name ?? 'HR' }}</div>
+                                    @else
+                                        <div class="text-muted">Not signed</div>
                                     @endif
                                 </td>
                             </tr>

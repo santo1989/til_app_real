@@ -23,7 +23,7 @@
                     </tbody>
                 </table>
                 <textarea name="comments" class="form-control" placeholder="Overall comments"></textarea>
-                <button class="btn btn-primary mt-2">Submit Midterm</button>
+                <button class="btn btn-outline-primary mt-2">Submit Midterm</button>
             </form>
         </div>
     </div>

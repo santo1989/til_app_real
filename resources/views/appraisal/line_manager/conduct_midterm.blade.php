@@ -4,10 +4,11 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h5 class="mb-0">Conduct Midterm Review for {{ $employee->name }}</h5>
-                <a href="{{ route('appraisals.midterm.pdf', ['appraisal_id' => $appraisal->id ?? 0]) }}" target="_blank"
-                    class="btn btn-sm btn-danger">
+                <x-ui.button variant="danger"
+                    href="{{ route('appraisals.midterm.pdf', ['appraisal_id' => $appraisal->id ?? 0]) }}" target="_blank"
+                    class="btn-sm">
                     <i class="fas fa-file-pdf"></i> Download PDF
-                </a>
+                </x-ui.button>
                 @if (isset($appraisal) && $appraisal->id)
                     <div class="ml-2">
                         <label class="mr-2">Employee Sign:</label>
@@ -52,7 +53,7 @@
                         @endforeach
                     </tbody>
                 </table>
-                <button class="btn btn-primary">Submit Midterm Review</button>
+                <x-ui.button variant="primary" type="submit">Submit Midterm Review</x-ui.button>
             </form>
         </div>
     </div>

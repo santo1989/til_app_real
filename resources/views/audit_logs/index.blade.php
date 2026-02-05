@@ -4,7 +4,7 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3>Audit Logs</h3>
-            <a href="{{ route('audit-logs.create') }}" class="btn btn-primary">Add Audit Log</a>
+            <x-ui.button variant="primary" href="{{ route('audit-logs.create') }}">Add Audit Log</x-ui.button>
         </div>
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -30,13 +30,15 @@
                             <td>{{ Str::limit($log->details, 50) }}</td>
                             <td>{{ $log->created_at ? $log->created_at->format('Y-m-d H:i') : '' }}</td>
                             <td>
-                                <a href="{{ route('audit-logs.show', $log) }}" class="btn btn-sm btn-info">View</a>
-                                <a href="{{ route('audit-logs.edit', $log) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <x-ui.button variant="info" href="{{ route('audit-logs.show', $log) }}"
+                                    class="btn-sm">View</x-ui.button>
+                                <x-ui.button variant="warning" href="{{ route('audit-logs.edit', $log) }}"
+                                    class="btn-sm">Edit</x-ui.button>
                                 <form action="{{ route('audit-logs.destroy', $log) }}" method="POST" class="d-inline"
                                     onsubmit="return confirm('Delete this log?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    <x-ui.button variant="danger" type="submit" class="btn-sm">Delete</x-ui.button>
                                 </form>
                             </td>
                         </tr>

@@ -79,12 +79,12 @@
                     </div>
 
                     <div class="text-end">
-                        <a href="{{ route('financial-years.show', $financialYear) }}" class="btn btn-secondary">
+                        <x-ui.button variant="secondary" href="{{ route('financial-years.show', $financialYear) }}">
                             <i class="fas fa-times"></i> Cancel
-                        </a>
-                        <button type="submit" class="btn btn-primary">
+                        </x-ui.button>
+                        <x-ui.button variant="primary" type="submit">
                             <i class="fas fa-save"></i> Update Financial Year
-                        </button>
+                        </x-ui.button>
                     </div>
                 </form>
             </div>

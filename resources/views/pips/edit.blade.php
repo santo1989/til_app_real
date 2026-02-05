@@ -29,7 +29,7 @@
                 <div class="mb-2"><label>Notes</label>
                     <textarea name="notes" class="form-control">{{ $pip->notes }}</textarea>
                 </div>
-                <button class="btn btn-primary">Save</button>
+                <x-ui.button variant="primary" type="submit">Save</x-ui.button>
             </form>
         </div>
     </div>

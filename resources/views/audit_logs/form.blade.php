@@ -27,8 +27,8 @@
                 <label for="details" class="form-label">Details</label>
                 <textarea name="details" id="details" class="form-control" rows="4">{{ old('details', $log->details) }}</textarea>
             </div>
-            <button type="submit" class="btn btn-success">{{ $mode === 'edit' ? 'Update' : 'Create' }}</button>
-            <a href="{{ route('audit-logs.index') }}" class="btn btn-secondary">Cancel</a>
+            <x-ui.button variant="success" type="submit">{{ $mode === 'edit' ? 'Update' : 'Create' }}</x-ui.button>
+            <x-ui.button variant="secondary" href="{{ route('audit-logs.index') }}">Cancel</x-ui.button>
         </form>
     </div>
 @endsection

@@ -3,7 +3,8 @@
     <div class="card">
         <div class="card-body">
             <h5>Departments</h5>
-            <a class="btn btn-primary mb-2" href="{{ route('departments.create') }}">Create Department</a>
+            <x-ui.button variant="primary" href="{{ route('departments.create') }}" class="mb-2">Create
+                Department</x-ui.button>
             <table class="table datatable">
                 <thead>
                     <tr>
@@ -19,7 +20,8 @@
                             <td>{{ $i + 1 }}</td>
                             <td>{{ $d->name }}</td>
                             <td>{{ $d->head ? $d->head->name : '-' }}</td>
-                            <td><a class="btn btn-sm btn-secondary" href="{{ route('departments.edit', $d) }}">Edit</a></td>
+                            <td><x-ui.button variant="secondary" href="{{ route('departments.edit', $d) }}"
+                                    class="btn-sm">Edit</x-ui.button></td>
                         </tr>
                     @endforeach
                 </tbody>

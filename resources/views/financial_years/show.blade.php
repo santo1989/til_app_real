@@ -80,18 +80,18 @@
                         </table>
 
                         <div class="text-end mt-3">
-                            <a href="{{ route('financial-years.edit', $financialYear) }}" class="btn btn-warning">
+                            <x-ui.button variant="warning" href="{{ route('financial-years.edit', $financialYear) }}">
                                 <i class="fas fa-edit"></i> Edit
-                            </a>
+                            </x-ui.button>
                             @if (!$financialYear->is_active)
                                 <form action="{{ route('financial-years.activate', $financialYear) }}" method="POST"
                                     class="d-inline">
                                     @csrf
                                     @method('PUT')
-                                    <button type="submit" class="btn btn-success"
+                                    <x-ui.button variant="success" type="submit"
                                         onclick="return confirm('Activate this financial year? This will deactivate all others.')">
                                         <i class="fas fa-check-circle"></i> Activate
-                                    </button>
+                                    </x-ui.button>
                                 </form>
                             @endif
                         </div>

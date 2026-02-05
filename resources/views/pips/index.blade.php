@@ -36,8 +36,8 @@
                         @endforeach
                     @endif
                 </select>
-                <button class="btn btn-sm btn-primary mr-2">Filter</button>
-                <a href="{{ route('pips.index') }}" class="btn btn-sm btn-secondary">Reset</a>
+                <button class="btn btn-sm btn-outline-primary mr-2">Filter</button>
+                <a href="{{ route('pips.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
                 <a href="{{ route('pips.export') }}?{{ http_build_query(request()->query()) }}"
                     class="btn btn-sm btn-outline-success ml-2">Export CSV</a>
             </form>
@@ -76,11 +76,12 @@
                             <td>{{ $pip->reason }}</td>
                             <td>{{ optional($pip->created_at)->format('d-M-Y') ?? '—' }}</td>
                             <td>
-                                <a href="{{ route('pips.show', $pip->id) }}" class="btn btn-sm btn-primary">View</a>
+                                <a href="{{ route('pips.show', $pip->id) }}"
+                                    class="btn btn-sm btn-outline-primary">View</a>
                                 @if ($pip->status !== 'closed')
                                     <form action="{{ route('pips.close', $pip->id) }}" method="POST"
                                         style="display:inline">@csrf
-                                        <button class="btn btn-sm btn-danger">Close</button>
+                                        <button class="btn btn-sm btn-outline-danger">Close</button>
                                     </form>
                                 @endif
                             </td>

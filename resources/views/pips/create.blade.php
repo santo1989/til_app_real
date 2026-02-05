@@ -20,7 +20,7 @@
                 <div class="mb-2"><label>Notes</label>
                     <textarea name="notes" class="form-control"></textarea>
                 </div>
-                <button class="btn btn-primary">Create</button>
+                <x-ui.button variant="primary" type="submit">Create</x-ui.button>
             </form>
         </div>
     </div>

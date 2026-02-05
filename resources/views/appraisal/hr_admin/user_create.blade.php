@@ -84,8 +84,8 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Create User</button>
-                <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancel</a>
+                <x-ui.button variant="primary" type="submit">Create User</x-ui.button>
+                <x-ui.button variant="secondary" href="{{ route('users.index') }}">Cancel</x-ui.button>
             </form>
         </div>
     </div>

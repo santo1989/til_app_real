@@ -4,7 +4,7 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3>Manage Team/Department Objectives</h3>
-            <a href="{{ route('team.objectives.create') }}" class="btn btn-primary">Add Team Objective</a>
+            <x-ui.button variant="primary" href="{{ route('team.objectives.create') }}">Add Team Objective</x-ui.button>
         </div>
 
         @if (session('success'))
@@ -50,13 +50,15 @@
                             </td>
                             <td>{{ $obj->financial_year }}</td>
                             <td>
-                                <a href="{{ route('team.objectives.show', $obj) }}" class="btn btn-sm btn-info">View</a>
-                                <a href="{{ route('team.objectives.edit', $obj) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <x-ui.button variant="info" href="{{ route('team.objectives.show', $obj) }}"
+                                    class="btn-sm">View</x-ui.button>
+                                <x-ui.button variant="warning" href="{{ route('team.objectives.edit', $obj) }}"
+                                    class="btn-sm">Edit</x-ui.button>
                                 <form action="{{ route('team.objectives.destroy', $obj) }}" method="POST" class="d-inline"
                                     onsubmit="return confirm('Delete this team objective?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    <x-ui.button variant="danger" type="submit" class="btn-sm">Delete</x-ui.button>
                                 </form>
                             </td>
                         </tr>

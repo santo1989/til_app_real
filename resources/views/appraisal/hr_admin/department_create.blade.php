@@ -20,7 +20,7 @@
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <x-ui.button variant="primary" type="submit">Create</x-ui.button>
             </form>
         </div>
     </div>

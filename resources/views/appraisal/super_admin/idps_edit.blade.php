@@ -8,8 +8,9 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>Edit IDP #{{ $idp->id }}</h4>
                         <div>
-                            <a href="{{ route('idps.show', $idp) }}" class="btn btn-info btn-sm">View</a>
-                            <a href="{{ route('idps.index') }}" class="btn btn-secondary btn-sm">Back to List</a>
+                            <x-ui.button variant="info" href="{{ route('idps.show', $idp) }}" class="btn-sm">View</x-ui.button>
+                            <x-ui.button variant="secondary" href="{{ route('idps.index') }}" class="btn-sm">Back to
+                                List</x-ui.button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -103,8 +104,8 @@
                             </div>
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">Update IDP</button>
-                                <a href="{{ route('idps.show', $idp) }}" class="btn btn-secondary">Cancel</a>
+                                <x-ui.button variant="primary" type="submit">Update IDP</x-ui.button>
+                                <x-ui.button variant="secondary" href="{{ route('idps.show', $idp) }}">Cancel</x-ui.button>
                             </div>
                         </form>
                     </div>

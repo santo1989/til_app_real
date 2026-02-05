@@ -8,13 +8,15 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>IDP Details #{{ $idp->id }}</h4>
                         <div>
-                            <a href="{{ route('idps.edit', $idp) }}" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="{{ route('idps.index') }}" class="btn btn-secondary btn-sm">Back to List</a>
+                            <x-ui.button variant="warning" href="{{ route('idps.edit', $idp) }}"
+                                class="btn-sm">Edit</x-ui.button>
+                            <x-ui.button variant="secondary" href="{{ route('idps.index') }}" class="btn-sm">Back to
+                                List</x-ui.button>
                             <form action="{{ route('idps.destroy', $idp) }}" method="POST" class="d-inline"
                                 onsubmit="return confirm('Are you sure you want to delete this IDP?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                <x-ui.button variant="danger" type="submit" class="btn-sm">Delete</x-ui.button>
                             </form>
                         </div>
                     </div>

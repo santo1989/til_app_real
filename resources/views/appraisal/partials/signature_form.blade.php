@@ -12,12 +12,12 @@
     <input type="hidden" id="{{ $inputImage }}" name="image">
     <div class="form-inline align-items-center">
         <input type="text" name="name" class="form-control form-control-sm mr-2" placeholder="Your name">
-        <button type="button" class="btn btn-sm btn-secondary mr-2"
-            onclick="toggleCanvas('{{ $canvasId }}')">Draw</button>
-        <button class="btn btn-sm btn-primary mr-2" type="submit">Sign (Name)</button>
-        <button type="button" class="btn btn-sm btn-success"
+        <x-ui.button variant="secondary" type="button" class="btn-sm mr-2"
+            onclick="toggleCanvas('{{ $canvasId }}')">Draw</x-ui.button>
+        <x-ui.button variant="primary" type="submit" class="btn-sm mr-2">Sign (Name)</x-ui.button>
+        <x-ui.button variant="success" type="button" class="btn-sm"
             onclick="submitCanvasSignature('{{ $formId }}','{{ $canvasId }}','{{ $inputImage }}')">Sign
-            (Drawn)</button>
+            (Drawn)</x-ui.button>
     </div>
     <div style="display:none; margin-top:8px;" id="wrap_{{ $canvasId }}">
         <div style="display:flex; gap:12px; align-items:flex-start;">
@@ -26,8 +26,8 @@
                     style="border:1px solid #ccc; background:#fff; touch-action:none;">Your browser does not support
                     canvas</canvas>
                 <div class="mt-1">
-                    <button type="button" class="btn btn-sm btn-outline-secondary"
-                        onclick="clearCanvas('{{ $canvasId }}')">Clear</button>
+                    <x-ui.button variant="secondary" type="button" class="btn-sm btn-outline-secondary"
+                        onclick="clearCanvas('{{ $canvasId }}')">Clear</x-ui.button>
                 </div>
             </div>
             <div style="min-width:220px;">
@@ -130,7 +130,8 @@
                         if (sizeEl) sizeEl.innerText = kb + ' KB (preview)';
                         if (warnEl) warnEl.style.display = kb > 200 ? 'block' : 'none';
                     } catch (e) {
-                        /* ignore preview failures */ }
+                        /* ignore preview failures */
+                    }
                 }
 
                 canvas.addEventListener('pointerup', updatePreview);

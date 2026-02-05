@@ -25,7 +25,7 @@ class RoleMiddleware
         }
 
         // Super admin has access to everything
-        if ($user->role === 'super_admin') {
+        if ($user->isSuperAdmin()) {
             return $next($request);
         }
 

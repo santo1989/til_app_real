@@ -34,8 +34,8 @@
                         @endforelse
                     </tbody>
                 </table>
-                <button type="button" id="add-row" class="btn btn-sm btn-secondary">Add Objective</button>
-                <button type="submit" id="save-btn" class="btn btn-primary" disabled>Save</button>
+                <button type="button" id="add-row" class="btn btn-sm btn-outline-secondary">Add Objective</button>
+                <button type="submit" id="save-btn" class="btn btn-outline-primary" disabled>Save</button>
             </form>
         </div>
     </div>
@@ -61,7 +61,7 @@
                     if ($('#objectives-validation-msg').length === 0) {
                         $('#objectives-body').closest('table').after(
                             '<div id="objectives-validation-msg" class="text-danger mt-2">Objectives must be 3–6 items and weightages must sum to 100%.</div>'
-                            );
+                        );
                     }
                 } else {
                     $('#objectives-validation-msg').remove();
@@ -86,7 +86,7 @@
 
             $('#objectives-body').on('input change', 'input[name*="weightage"]', updateValidation);
             $('#objectives-body').on('input', 'input[name*="description"], input[name*="target"]',
-            updateValidation);
+                updateValidation);
 
             // allow removal if future UI adds remove buttons; keep handler ready
             $('#objectives-body').on('click', '.remove-row', function() {

@@ -431,6 +431,27 @@
         </div>
     </div>
 
+    @php
+        $hrPath = $appraisal->hr_signature_path ?? ($hrSignaturePath ?? null);
+    @endphp
+    @if (!empty($hrPath) || (!empty($appraisal->signed_by_hr) && ($appraisal->hr_signed_by_name ?? false)))
+        <div class="signature-section" style="margin-top:10px;">
+            <div class="signature-box" style="width:30%;">
+                <div><strong>HR / Admin Signature</strong></div>
+                <div class="signature-line">
+                    @if (!empty($hrPath))
+                        <div>
+                            <img src="{{ public_path('storage/' . $hrPath) }}"
+                                style="max-width:250px; max-height:80px;" alt="HR Signature" />
+                        </div>
+                    @endif
+                    <div>Name: {{ $appraisal->hr_signed_by_name ?? 'HR' }}</div>
+                    <div>Date: {{ optional($appraisal->hr_signed_at)->format('d-M-Y') ?? '' }}</div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div style="margin-top: 30px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffc107;">
         <strong>Employee Acknowledgement:</strong> I have reviewed this appraisal with my Line Manager and understand
         the ratings and feedback provided. My signature indicates acknowledgement, not necessarily agreement. I may add

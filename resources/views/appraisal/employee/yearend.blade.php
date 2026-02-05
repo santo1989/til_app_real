@@ -25,7 +25,7 @@
                 </table>
                 <div>Total (auto-calculated): <span id="total">0</span></div>
                 <textarea name="comments" class="form-control" placeholder="Comments"></textarea>
-                <button class="btn btn-primary mt-2">Submit Year-End</button>
+                <x-ui.button variant="primary" type="submit" class="mt-2">Submit Year-End</x-ui.button>
             </form>
         </div>
     </div>

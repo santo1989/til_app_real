@@ -8,13 +8,15 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>Objective Details #{{ $objective->id }}</h4>
                         <div>
-                            <a href="{{ route('objectives.edit', $objective) }}" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="{{ route('objectives.index') }}" class="btn btn-secondary btn-sm">Back to List</a>
+                            <x-ui.button variant="warning" href="{{ route('objectives.edit', $objective) }}"
+                                class="btn-sm">Edit</x-ui.button>
+                            <x-ui.button variant="secondary" href="{{ route('objectives.index') }}" class="btn-sm">Back to
+                                List</x-ui.button>
                             <form action="{{ route('objectives.destroy', $objective) }}" method="POST" class="d-inline"
                                 onsubmit="return confirm('Are you sure you want to delete this objective?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                <x-ui.button variant="danger" type="submit" class="btn-sm">Delete</x-ui.button>
                             </form>
                         </div>
                     </div>

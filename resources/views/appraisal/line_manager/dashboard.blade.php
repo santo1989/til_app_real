@@ -8,7 +8,7 @@
                     <p class="text-muted mb-0">Welcome, {{ auth()->user()->name }} — manage your team efficiently.</p>
                 </div>
                 <div>
-                    <a href="{{ route('objectives.team') }}" class="btn btn-primary">Team Objectives</a>
+                    <x-ui.button variant="primary" href="{{ route('objectives.team') }}">Team Objectives</x-ui.button>
                 </div>
             </div>
 
@@ -19,6 +19,17 @@
                             <h6>Team Members</h6>
                             <h3>{{ $stats['team_size'] ?? '—' }}</h3>
                             <small class="text-muted">Active reports</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h6>Team IDPs</h6>
+                            <h3>{{ $stats['team_idps'] ?? '—' }}</h3>
+                            <p class="text-muted">Development plans for your reports</p>
+                            <a href="{{ route('idps.index', ['manager_id' => auth()->id()]) }}"
+                                class="btn btn-sm btn-outline-info mt-2">View Team IDPs</a>
                         </div>
                     </div>
                 </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use App\Models\AuditLog;
 
 class ImpersonationController extends Controller
 {
@@ -16,15 +17,8 @@ class ImpersonationController extends Controller
     // Start impersonation: only super_admin may start
     public function start(Request $request, User $user)
     {
+        $this->authorize('impersonate', $user);
         $current = $request->user();
-        if ($current->role !== 'super_admin') {
-            abort(403);
-        }
-
-        // Prevent impersonating another super admin
-        if ($user->role === 'super_admin') {
-            return redirect()->back()->withErrors(['impersonate' => 'Cannot impersonate another Super Admin.']);
-        }
 
         // Store the original user id so we can restore later
         $request->session()->put('impersonator_id', $current->id);
@@ -32,6 +26,14 @@ class ImpersonationController extends Controller
 
         // Log in as the target user
         Auth::loginUsingId($user->id);
+
+        AuditLog::create([
+            'user_id' => $current->id,
+            'action' => 'impersonation_started',
+            'table_name' => 'users',
+            'record_id' => $user->id,
+            'details' => "User {$current->id} started impersonating {$user->id}",
+        ]);
 
         // Add a flash message
         return redirect()->route('dashboard')->with('success', "You are now impersonating {$user->name}");
@@ -51,6 +53,13 @@ class ImpersonationController extends Controller
         $impersonator = User::find($impersonatorId);
         if ($impersonator) {
             Auth::loginUsingId($impersonator->id);
+            AuditLog::create([
+                'user_id' => $impersonator->id,
+                'action' => 'impersonation_stopped',
+                'table_name' => 'users',
+                'record_id' => $impersonatedId,
+                'details' => "Impersonation ended; restored to user {$impersonator->id} from {$impersonatedId}",
+            ]);
         } else {
             // If original user missing, logout
             Auth::logout();

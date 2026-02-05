@@ -42,14 +42,20 @@
             border-radius: 5px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
+        .btn-outline-primary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid transparent;
             padding: 12px 30px;
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-origin: border-box;
+            -webkit-background-clip: padding-box;
+            background-clip: padding-box;
         }
 
-        .btn-primary:hover {
+        .btn-outline-primary:hover {
             background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: #fff;
         }
     </style>
 </head>
@@ -95,7 +101,7 @@
             </div>
 
             <div class="d-grid gap-2 mt-4">
-                <a href="{{ route('login') }}" class="btn btn-primary btn-lg">
+                <a href="{{ route('login') }}" class="btn btn-outline-primary btn-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                         class="bi bi-box-arrow-in-right me-2" viewBox="0 0 16 16" style="vertical-align: middle;">
                         <path fill-rule="evenodd"

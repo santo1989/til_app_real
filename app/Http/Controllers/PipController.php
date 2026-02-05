@@ -8,12 +8,13 @@ use App\Models\User;
 use App\Mail\PipCreatedMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Department;
+use App\Models\AuditLog;
 
 class PipController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:hr_admin,super_admin');
+        $this->authorizeResource(\App\Models\Pip::class, 'pip');
     }
 
     public function index()
@@ -72,6 +73,13 @@ class PipController extends Controller
         $data['status'] = 'open';
         $data['created_by'] = auth()->id();
         $pip = Pip::create($data);
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'pip_created',
+            'table_name' => 'pips',
+            'record_id' => $pip->id,
+            'details' => "PIP created for user_id {$pip->user_id} (ID {$pip->id})",
+        ]);
         // notify
         try {
             self::notifyHrAboutPip($pip);
@@ -99,6 +107,13 @@ class PipController extends Controller
             'status' => 'required|in:open,closed'
         ]);
         $pip->update($data);
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'pip_updated',
+            'table_name' => 'pips',
+            'record_id' => $pip->id,
+            'details' => "PIP updated: ID {$pip->id}",
+        ]);
         return redirect()->route('pips.show', $pip->id)->with('success', 'PIP updated.');
     }
 
@@ -137,7 +152,15 @@ class PipController extends Controller
     public function close(Request $request, $id)
     {
         $pip = Pip::findOrFail($id);
+        $this->authorize('close', $pip);
         $pip->update(['status' => 'closed']);
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'pip_closed',
+            'table_name' => 'pips',
+            'record_id' => $pip->id,
+            'details' => "PIP closed: ID {$pip->id}",
+        ]);
         return redirect()->route('pips.index')->with('success', 'PIP closed.');
     }
 

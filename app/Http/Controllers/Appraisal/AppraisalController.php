@@ -64,16 +64,37 @@ class AppraisalController extends Controller
         foreach ($request->input('teamObjectives', []) as $row) {
             $obj = Objective::find($row['id']);
             if ($obj) {
+                // Ensure the current user is authorized to enter/modify the achieved value
+                $this->authorize('enterAchieved', $obj);
+
                 $obj->target_achieved = $row['target_achieved'];
                 $obj->final_score = $row['final_score'];
+                if (!is_null($row['target_achieved'])) {
+                    $obj->target_achieved_entered_by = auth()->id();
+                    $obj->target_achieved_entered_at = now();
+                } else {
+                    // Clear enterer metadata when a null is saved
+                    $obj->target_achieved_entered_by = null;
+                    $obj->target_achieved_entered_at = null;
+                }
                 $obj->save();
             }
         }
         foreach ($request->input('individualObjectives', []) as $row) {
             $obj = Objective::find($row['id']);
             if ($obj) {
+                // Ensure the current user is authorized to enter/modify the achieved value
+                $this->authorize('enterAchieved', $obj);
+
                 $obj->target_achieved = $row['target_achieved'];
                 $obj->final_score = $row['final_score'];
+                if (!is_null($row['target_achieved'])) {
+                    $obj->target_achieved_entered_by = auth()->id();
+                    $obj->target_achieved_entered_at = now();
+                } else {
+                    $obj->target_achieved_entered_by = null;
+                    $obj->target_achieved_entered_at = null;
+                }
                 $obj->save();
             }
         }
@@ -95,7 +116,14 @@ class AppraisalController extends Controller
         if (!empty($data['rating'])) {
             $data['rating'] = $this->normalizeRatingToDb($data['rating']);
         }
-        Appraisal::create($data);
+        $appraisal = Appraisal::create($data);
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'appraisal_created',
+            'table_name' => 'appraisals',
+            'record_id' => $appraisal->id,
+            'details' => "Appraisal created for user_id {$appraisal->user_id} (ID {$appraisal->id})",
+        ]);
         return redirect()->route('appraisals.index')->with('success', 'Appraisal created successfully.');
     }
     public function show(Appraisal $appraisal)
@@ -123,11 +151,26 @@ class AppraisalController extends Controller
             $data['rating'] = $this->normalizeRatingToDb($data['rating']);
         }
         $appraisal->update($data);
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'appraisal_updated',
+            'table_name' => 'appraisals',
+            'record_id' => $appraisal->id,
+            'details' => "Appraisal updated: ID {$appraisal->id}",
+        ]);
         return redirect()->route('appraisals.show', $appraisal)->with('success', 'Appraisal updated successfully.');
     }
     public function destroy(Appraisal $appraisal)
     {
+        $appId = $appraisal->id;
         $appraisal->delete();
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'appraisal_deleted',
+            'table_name' => 'appraisals',
+            'record_id' => $appId,
+            'details' => "Appraisal deleted: ID {$appId}",
+        ]);
         return redirect()->route('appraisals.index')->with('success', 'Appraisal deleted.');
     }
 
@@ -175,7 +218,7 @@ class AppraisalController extends Controller
             }
         }
 
-        Appraisal::create([
+        $appraisal = Appraisal::create([
             'user_id' => auth()->id(),
             'type' => 'midterm',
             'date' => now(),
@@ -183,6 +226,17 @@ class AppraisalController extends Controller
             'comments' => $request->input('comments'),
             'financial_year' => $activeFY
         ]);
+
+        // Persist any inline signatures from midterm form: sign_employee_mid, sign_manager_mid, sign_hr_mid
+        try {
+            $this->storeAppraisalSignatures($appraisal, [
+                'sign_employee_mid' => 'employee',
+                'sign_manager_mid' => 'manager',
+                'sign_hr_mid' => 'hr',
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Failed storing midterm inline signatures', ['error' => $e->getMessage(), 'user' => auth()->id()]);
+        }
 
         AuditLog::create([
             'user_id' => auth()->id(),
@@ -225,7 +279,17 @@ class AppraisalController extends Controller
         foreach ($request->input('achievements', []) as $a) {
             $obj = Objective::find($a['id'] ?? null);
             if ($obj) {
+                // Authorization: ensure caller may enter/modify achieved value for this objective
+                $this->authorize('enterAchieved', $obj);
+
                 $obj->target_achieved = floatval($a['score']);
+                if (!is_null($a['score'])) {
+                    $obj->target_achieved_entered_by = auth()->id();
+                    $obj->target_achieved_entered_at = now();
+                } else {
+                    $obj->target_achieved_entered_by = null;
+                    $obj->target_achieved_entered_at = null;
+                }
                 $obj->save();
             }
         }
@@ -248,6 +312,18 @@ class AppraisalController extends Controller
             'conducted_by' => auth()->id(),
             'status' => 'completed',
         ]);
+
+        // Persist any inline signatures from year-end form: sign_employee_year, sign_manager_year, sign_supervisor_year, sign_hr_manager_year
+        try {
+            $this->storeAppraisalSignatures($appraisal, [
+                'sign_employee_year' => 'employee',
+                'sign_manager_year' => 'manager',
+                'sign_supervisor_year' => 'supervisor',
+                'sign_hr_manager_year' => 'hr',
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Failed storing yearend inline signatures', ['error' => $e->getMessage(), 'user' => auth()->id()]);
+        }
 
         if ($ratingCode === 'below') {
             $pip = Pip::create([
@@ -484,7 +560,17 @@ class AppraisalController extends Controller
         foreach ($request->input('achievements', []) as $a) {
             $obj = Objective::find($a['id'] ?? null);
             if ($obj) {
+                // Authorization: ensure caller may enter/modify achieved value for this objective
+                $this->authorize('enterAchieved', $obj);
+
                 $obj->target_achieved = floatval($a['score']);
+                if (!is_null($a['score'])) {
+                    $obj->target_achieved_entered_by = auth()->id();
+                    $obj->target_achieved_entered_at = now();
+                } else {
+                    $obj->target_achieved_entered_by = null;
+                    $obj->target_achieved_entered_at = null;
+                }
                 $obj->save();
             }
         }
@@ -617,7 +703,20 @@ class AppraisalController extends Controller
             'details' => "Generated year-end appraisal PDF for {$employee->name} - FY: {$financialYear}",
         ]);
 
-        $pdf = Pdf::loadView('appraisal.pdf.yearend_form', compact('employee', 'appraisal', 'objectives', 'financialYear'));
+        // Attempt to locate any HR signature image stored for this appraisal and pass it to the PDF view.
+        $hrSignaturePath = null;
+        try {
+            $hrDir = 'signatures/' . ($employee->id ?? $appraisal->user_id) . '/appraisal_' . ($appraisal->id ?? 'new') . '/hr';
+            $files = Storage::disk('public')->files($hrDir);
+            if (!empty($files)) {
+                // pick the last file returned as the most recent signature for HR
+                $hrSignaturePath = end($files);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Error locating HR signature for PDF', ['error' => $e->getMessage(), 'appraisal_id' => $appraisal->id ?? $appraisal_id]);
+        }
+
+        $pdf = Pdf::loadView('appraisal.pdf.yearend_form', compact('employee', 'appraisal', 'objectives', 'financialYear', 'hrSignaturePath'));
         $pdf->setPaper('A4', 'portrait');
 
         $fileName = "YearEnd_Appraisal_{$employee->name}_{$financialYear}.pdf";
@@ -758,6 +857,106 @@ class AppraisalController extends Controller
         }
 
         return redirect()->back()->with('success', 'Signature recorded.');
+    }
+
+    /**
+     * Store inline signatures (base64) from a form and attach to the appraisal record when possible.
+     * @param \App\Models\Appraisal $appraisal
+     * @param array $mapping inputName => role ('employee'|'manager'|'supervisor'|'hr')
+     * @return void
+     */
+    private function storeAppraisalSignatures($appraisal, array $mapping): void
+    {
+        foreach ($mapping as $inputName => $role) {
+            $imageData = request()->input($inputName);
+            if (empty($imageData) || !is_string($imageData) || strpos($imageData, 'base64,') === false) continue;
+            $data = substr($imageData, strpos($imageData, ',') + 1);
+            $bin = base64_decode($data);
+            if ($bin === false) continue;
+
+            // Attempt small resize if > 500 KB
+            $max = 500 * 1024;
+            if (strlen($bin) > $max && function_exists('imagecreatefromstring')) {
+                $src = @imagecreatefromstring($bin);
+                if ($src !== false) {
+                    $w = imagesx($src);
+                    $h = imagesy($src);
+                    $scale = sqrt($max / strlen($bin));
+                    $nw = max(100, (int)($w * $scale));
+                    $nh = max(40, (int)($h * $scale));
+                    $dst = imagecreatetruecolor($nw, $nh);
+                    imagealphablending($dst, false);
+                    imagesavealpha($dst, true);
+                    $transparent = imagecolorallocatealpha($dst, 255, 255, 255, 127);
+                    imagefilledrectangle($dst, 0, 0, $nw, $nh, $transparent);
+                    imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
+                    ob_start();
+                    imagepng($dst);
+                    $bin = ob_get_clean();
+                    imagedestroy($dst);
+                    imagedestroy($src);
+                }
+            }
+
+            $path = 'signatures/' . ($appraisal->user_id ?? auth()->id()) . '/appraisal_' . ($appraisal->id ?? 'new') . '/' . $role . '/' . now()->format('Ymd') . '/' . uniqid() . '.png';
+            try {
+                $dir = dirname($path);
+                if ($dir && $dir !== '.') Storage::disk('public')->makeDirectory($dir);
+                Storage::disk('public')->put($path, $bin);
+                // attach to appraisal where appropriate
+                if ($role === 'employee') {
+                    $appraisal->update([
+                        'employee_signature_path' => $path,
+                        'signed_by_employee' => true,
+                        'employee_signed_at' => now(),
+                        'employee_signed_by_name' => auth()->user()->name,
+                    ]);
+                } elseif ($role === 'manager') {
+                    $appraisal->update([
+                        'manager_signature_path' => $path,
+                        'signed_by_manager' => true,
+                        'manager_signed_at' => now(),
+                        'manager_signed_by_name' => auth()->user()->name,
+                    ]);
+                } elseif ($role === 'supervisor') {
+                    $appraisal->update([
+                        'supervisor_signature_path' => $path,
+                        'signed_by_supervisor' => true,
+                        'supervisor_signed_at' => now(),
+                        'supervisor_signed_by_name' => auth()->user()->name,
+                    ]);
+                } else {
+                    if ($role === 'hr') {
+                        // Save HR signature path and metadata directly on the appraisal record
+                        $appraisal->update([
+                            'hr_signature_path' => $path,
+                            'signed_by_hr' => true,
+                            'hr_signed_at' => now(),
+                            'hr_signed_by_name' => auth()->user()->name,
+                        ]);
+
+                        AuditLog::create([
+                            'user_id' => auth()->id(),
+                            'action' => 'hr_signature_saved',
+                            'table_name' => 'appraisals',
+                            'record_id' => $appraisal->id ?? null,
+                            'details' => "Saved HR signature for appraisal (role={$role}) to {$path}",
+                        ]);
+                    } else {
+                        // Other auxiliary signatures: record audit only
+                        AuditLog::create([
+                            'user_id' => auth()->id(),
+                            'action' => 'signature_saved',
+                            'table_name' => 'appraisals',
+                            'record_id' => $appraisal->id ?? null,
+                            'details' => "Saved auxiliary signature for role {$role} to {$path}",
+                        ]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to store appraisal inline signature', ['role' => $role, 'error' => $e->getMessage()]);
+            }
+        }
     }
 
     /**

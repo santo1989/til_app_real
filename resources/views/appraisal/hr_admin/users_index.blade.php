@@ -3,7 +3,7 @@
     <div class="card">
         <div class="card-body">
             <h5>Users</h5>
-            <a class="btn btn-primary mb-2" href="{{ route('users.create') }}">Create User</a>
+            <a class="btn btn-outline-primary mb-2" href="{{ route('users.create') }}">Create User</a>
             <table class="table datatable">
                 <thead>
                     <tr>
@@ -23,9 +23,9 @@
                             <td>{{ $u->role }}</td>
                             <td>
                                 @can('view', $u)
-                                    <a class="btn btn-sm btn-primary" href="{{ route('users.show', $u) }}">Show</a>
+                                    <a class="btn btn-sm btn-outline-primary" href="{{ route('users.show', $u) }}">Show</a>
                                 @endcan
-                                <a class="btn btn-sm btn-secondary" href="{{ route('users.edit', $u) }}">Edit</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ route('users.edit', $u) }}">Edit</a>
                             </td>
                         </tr>
                     @endforeach

@@ -17,9 +17,17 @@
                         <h4 class="mb-0">
                             <i class="fas fa-user-circle"></i> My Profile
                         </h4>
-                        <a href="{{ route('profile.edit') }}" class="btn btn-light btn-sm">
-                            <i class="fas fa-edit"></i> Edit Profile
-                        </a>
+                        <div>
+                            <x-ui.button variant="light" href="{{ route('profile.edit') }}" class="btn-sm">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </x-ui.button>
+                            @can('view', $user)
+                                <x-ui.button variant="primary" href="{{ route('idps.index', ['user_id' => $user->id]) }}"
+                                    class="btn-sm ms-2">
+                                    <i class="fas fa-graduation-cap"></i> View IDPs
+                                </x-ui.button>
+                            @endcan
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -34,15 +42,15 @@
                                 </div>
                                 <h5>{{ $user->name }}</h5>
                                 <p class="text-muted">{{ ucfirst(str_replace('_', ' ', $user->role)) }}</p>
-                                @if ($user->role === 'super_admin')
+                                @if ($user->isSuperAdmin())
                                     <span class="badge bg-danger">Super Admin</span>
-                                @elseif($user->role === 'hr_admin')
+                                @elseif($user->isHrAdmin())
                                     <span class="badge bg-info">HR Admin</span>
-                                @elseif($user->role === 'board')
+                                @elseif($user->isBoardMember())
                                     <span class="badge bg-warning">Board Member</span>
-                                @elseif($user->role === 'dept_head')
+                                @elseif($user->isDeptHead())
                                     <span class="badge bg-success">Department Head</span>
-                                @elseif($user->role === 'line_manager')
+                                @elseif($user->isLineManager())
                                     <span class="badge bg-primary">Line Manager</span>
                                 @else
                                     <span class="badge bg-secondary">Employee</span>
@@ -127,6 +135,31 @@
                     </div>
                 </div>
 
+                <!-- Quick Actions -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <strong>Quick Actions</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ route('objectives.my') }}" class="btn btn-outline-primary">My Objectives</a>
+                            <a href="{{ route('appraisal.employee.tabs') }}" class="btn btn-outline-secondary">Appraisal
+                                (Tabbed View)</a>
+                            <a href="{{ route('idp.index') }}" class="btn btn-outline-info">My IDP</a>
+                            @if ($user->isLineManager())
+                                <a href="{{ route('objectives.team') }}" class="btn btn-outline-success">Team
+                                    Objectives</a>
+                                <a href="{{ route('idps.index', ['manager_id' => $user->id]) }}"
+                                    class="btn btn-outline-warning">Team IDPs</a>
+                            @endif
+                            @if ($user->isHrAdmin() || $user->isSuperAdmin())
+                                <a href="{{ route('objectives.index') }}" class="btn btn-outline-dark">All Objectives</a>
+                                <a href="{{ route('idps.index') }}" class="btn btn-outline-dark">All IDPs</a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Recent Objectives -->
                 @if ($user->objectives->count() > 0)
                     <div class="card mb-4">
@@ -134,7 +167,7 @@
                             <h5 class="mb-0"><i class="fas fa-bullseye"></i> Recent Objectives</h5>
                             <div>
                                 <a href="{{ route('users.objectives.pdf', ['user_id' => $user->id]) }}" target="_blank"
-                                    class="btn btn-sm btn-danger">
+                                    class="btn btn-sm btn-outline-danger">
                                     <i class="fas fa-file-pdf"></i> Download PDF
                                 </a>
                             </div>
@@ -189,7 +222,7 @@
                                 @php $latest = $user->appraisals->first(); @endphp
                                 @if ($latest)
                                     <a href="{{ route('appraisals.yearend.pdf', ['appraisal_id' => $latest->id]) }}"
-                                        target="_blank" class="btn btn-sm btn-danger">
+                                        target="_blank" class="btn btn-sm btn-outline-danger">
                                         <i class="fas fa-file-pdf"></i> Download Latest PDF
                                     </a>
                                 @endif
@@ -211,7 +244,8 @@
                                     <tbody>
                                         @foreach ($user->appraisals->take(5) as $appraisal)
                                             <tr>
-                                                <td><span class="badge bg-info">{{ ucfirst($appraisal->type) }}</span></td>
+                                                <td><span class="badge bg-info">{{ ucfirst($appraisal->type) }}</span>
+                                                </td>
                                                 <td>{{ $appraisal->date ? \Carbon\Carbon::parse($appraisal->date)->format('d M, Y') : 'N/A' }}
                                                 </td>
                                                 <td>{{ $appraisal->achievement_score ?? 'N/A' }}</td>

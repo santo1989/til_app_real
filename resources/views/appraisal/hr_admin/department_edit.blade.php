@@ -8,10 +8,11 @@
                 @csrf
                 @method('PUT')
                 @include('components.alert')
-                
+
                 <div class="mb-3">
                     <label for="name" class="form-label">Department Name</label>
-                    <input type="text" name="name" id="name" class="form-control" value="{{ old('name', $department->name) }}" required>
+                    <input type="text" name="name" id="name" class="form-control"
+                        value="{{ old('name', $department->name) }}" required>
                 </div>
 
                 <div class="mb-3">
@@ -19,16 +20,18 @@
                     <select name="head_id" id="head_id" class="form-control">
                         <option value="">-- Select Head --</option>
                         @foreach (App\Models\User::whereIn('role', ['dept_head', 'hr_admin', 'line_manager', 'board'])->get() as $user)
-                            <option value="{{ $user->id }}" {{ old('head_id', $department->head_id) == $user->id ? 'selected' : '' }}>
+                            <option value="{{ $user->id }}"
+                                {{ old('head_id', $department->head_id) == $user->id ? 'selected' : '' }}>
                                 {{ $user->name }} ({{ $user->role }})
                             </option>
                         @endforeach
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Update Department</button>
-                <a href="{{ route('departments.index') }}" class="btn btn-secondary">Cancel</a>
-                <button type="button" class="btn btn-danger float-end" onclick="if(confirm('Delete this department?')) document.getElementById('delete-form').submit()">Delete</button>
+                <x-ui.button variant="primary" type="submit">Update Department</x-ui.button>
+                <x-ui.button variant="secondary" href="{{ route('departments.index') }}">Cancel</x-ui.button>
+                <x-ui.button variant="danger" type="button" class="float-end"
+                    onclick="if(confirm('Delete this department?')) document.getElementById('delete-form').submit()">Delete</x-ui.button>
             </form>
 
             <form id="delete-form" method="POST" action="{{ route('departments.destroy', $department) }}" class="d-none">

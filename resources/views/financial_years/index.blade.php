@@ -4,7 +4,7 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3>Financial Years Management</h3>
-            <a href="{{ route('financial-years.create') }}" class="btn btn-primary">
+            <a href="{{ route('financial-years.create') }}" class="btn btn-outline-primary">
                 <i class="fas fa-plus"></i> Create New Financial Year
             </a>
         </div>
@@ -66,12 +66,12 @@
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="{{ route('financial-years.show', $fy) }}" class="btn btn-sm btn-info"
-                                            title="View">
+                                        <a href="{{ route('financial-years.show', $fy) }}"
+                                            class="btn btn-sm btn-outline-info" title="View">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('financial-years.edit', $fy) }}" class="btn btn-sm btn-warning"
-                                            title="Edit">
+                                        <a href="{{ route('financial-years.edit', $fy) }}"
+                                            class="btn btn-sm btn-outline-warning" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         @if (!$fy->is_active)
@@ -79,7 +79,8 @@
                                                 class="d-inline">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="submit" class="btn btn-sm btn-success" title="Activate"
+                                                <button type="submit" class="btn btn-sm btn-outline-success"
+                                                    title="Activate"
                                                     onclick="return confirm('Activate this financial year? This will deactivate all others.')">
                                                     <i class="fas fa-check-circle"></i>
                                                 </button>
@@ -90,8 +91,8 @@
                                                 class="d-inline">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="submit" class="btn btn-sm btn-secondary" title="Close"
-                                                    onclick="return confirm('Close this financial year?')">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary"
+                                                    title="Close" onclick="return confirm('Close this financial year?')">
                                                     <i class="fas fa-lock"></i>
                                                 </button>
                                             </form>
@@ -101,7 +102,7 @@
                                                 class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"
                                                     onclick="return confirm('Delete this financial year? This cannot be undone.')">
                                                     <i class="fas fa-trash"></i>
                                                 </button>

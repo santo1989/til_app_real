@@ -16,6 +16,19 @@
                 </div>
             </div>
         </div>
+        <!-- IDP Summary -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card border-info">
+                    <div class="card-body text-center">
+                        <i class="fas fa-graduation-cap stat-icon text-info mb-3"></i>
+                        <h4 class="mb-1">{{ $stats['total_idps'] ?? 0 }}</h4>
+                        <p class="text-muted mb-0">Total IDPs</p>
+                        <small class="text-info">Manage individual development plans</small>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Quick Stats -->
         <div class="row mb-4">
@@ -75,7 +88,7 @@
                 <div class="card h-100">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                         <h6 class="mb-0"><i class="fas fa-user-clock"></i> Recent Users</h6>
-                        <a href="{{ route('users.index') }}" class="btn btn-sm btn-light">View All</a>
+                        <x-ui.button variant="light" href="{{ route('users.index') }}" class="btn-sm">View All</x-ui.button>
                     </div>
                     <div class="card-body p-0">
                         <div class="list-group list-group-flush">
@@ -90,15 +103,16 @@
                                             <span class="badge bg-{{ $user->is_active ? 'success' : 'secondary' }} me-2">
                                                 {{ ucfirst($user->role) }}
                                             </span>
-                                            <a href="{{ route('users.edit', $user) }}"
-                                                class="btn btn-sm btn-light">Edit</a>
-                                            @if (auth()->user()->role === 'super_admin' && $user->role !== 'super_admin')
+                                            <x-ui.button variant="light" href="{{ route('users.edit', $user) }}"
+                                                class="btn-sm">Edit</x-ui.button>
+                                            @can('impersonate', $user)
                                                 <form method="POST" action="{{ route('impersonate.start', $user) }}"
                                                     class="ms-2 m-0 p-0 impersonate-form" data-user="{{ $user->name }}">
                                                     @csrf
-                                                    <button class="btn btn-sm btn-outline-primary" title="Act as this user">Impersonate</button>
+                                                    <x-ui.button variant="primary" type="submit" class="btn-sm"
+                                                        title="Act as this user">Impersonate</x-ui.button>
                                                 </form>
-                                            @endif
+                                            @endcan
                                         </div>
                                     </div>
                                 </div>
@@ -117,7 +131,8 @@
                 <div class="card h-100">
                     <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
                         <h6 class="mb-0"><i class="fas fa-bullseye"></i> Recent Objectives</h6>
-                        <a href="{{ route('objectives.index') }}" class="btn btn-sm btn-light">View All</a>
+                        <x-ui.button variant="light" href="{{ route('objectives.index') }}" class="btn-sm">View
+                            All</x-ui.button>
                     </div>
                     <div class="card-body p-0">
                         <div class="list-group list-group-flush">
@@ -150,7 +165,8 @@
                 <div class="card h-100">
                     <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                         <h6 class="mb-0"><i class="fas fa-chart-line"></i> Recent Appraisals</h6>
-                        <a href="{{ route('appraisals.index') }}" class="btn btn-sm btn-light">View All</a>
+                        <x-ui.button variant="light" href="{{ route('appraisals.index') }}" class="btn-sm">View
+                            All</x-ui.button>
                     </div>
                     <div class="card-body p-0">
                         <div class="list-group list-group-flush">
@@ -186,7 +202,8 @@
                 <div class="card">
                     <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="fas fa-building"></i> Departments Overview</h5>
-                        <a href="{{ route('departments.index') }}" class="btn btn-sm btn-light">Manage Departments</a>
+                        <x-ui.button variant="light" href="{{ route('departments.index') }}" class="btn-sm">Manage
+                            Departments</x-ui.button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -222,10 +239,10 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('departments.edit', $department) }}"
-                                                    class="btn btn-sm btn-outline-primary">
+                                                <x-ui.button variant="primary"
+                                                    href="{{ route('departments.edit', $department) }}" class="btn-sm">
                                                     <i class="fas fa-edit"></i> Edit
-                                                </a>
+                                                </x-ui.button>
                                             </td>
                                         </tr>
                                     @empty
@@ -285,6 +302,9 @@
                                     </a>
                                     <a href="#" class="btn btn-outline-danger btn-sm">
                                         <i class="fas fa-file-pdf"></i> Generate PDF Report
+                                    </a>
+                                    <a href="{{ route('idps.index') }}" class="btn btn-outline-info btn-sm">
+                                        <i class="fas fa-graduation-cap"></i> Manage IDPs
                                     </a>
                                 </div>
                             </div>

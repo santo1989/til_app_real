@@ -37,6 +37,8 @@ class DashboardController extends Controller
                 $recentAppraisals = Appraisal::with('user')->latest()->take(5)->get();
                 $departments = Department::withCount('users')->get();
 
+                // include IDP totals for super admin
+                $stats['total_idps'] = \App\Models\Idp::count();
                 return view('appraisal.super_admin.dashboard', compact('stats', 'recentUsers', 'recentObjectives', 'recentAppraisals', 'departments'));
 
             case 'hr_admin':
@@ -46,10 +48,14 @@ class DashboardController extends Controller
                     'total_departments' => Department::count(),
                 ];
                 $departments = Department::all();
+                $stats['total_idps'] = \App\Models\Idp::count();
                 return view('appraisal.hr_admin.dashboard', compact('stats', 'departments'));
 
             case 'line_manager':
                 $teamSize = User::where('line_manager_id', $user->id)->count();
+                $teamIdps = \App\Models\Idp::whereHas('user', function ($q) use ($user) {
+                    $q->where('line_manager_id', $user->id);
+                })->count();
                 $pendingMidterms = Appraisal::where('type', 'midterm')
                     ->where('status', 'pending')
                     ->whereHas('user', function ($q) use ($user) {
@@ -66,6 +72,7 @@ class DashboardController extends Controller
                     'team_size' => $teamSize,
                     'pending_midterms' => $pendingMidterms,
                     'pending_yearend' => $pendingYearend,
+                    'team_idps' => $teamIdps,
                 ];
                 return view('appraisal.line_manager.dashboard', compact('stats'));
 

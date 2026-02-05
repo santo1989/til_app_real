@@ -8,8 +8,10 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>Edit Appraisal #{{ $appraisal->id }}</h4>
                         <div>
-                            <a href="{{ route('appraisals.show', $appraisal) }}" class="btn btn-info btn-sm">View</a>
-                            <a href="{{ route('appraisals.index') }}" class="btn btn-secondary btn-sm">Back to List</a>
+                            <x-ui.button variant="info" href="{{ route('appraisals.show', $appraisal) }}"
+                                class="btn-sm">View</x-ui.button>
+                            <x-ui.button variant="secondary" href="{{ route('appraisals.index') }}" class="btn-sm">Back to
+                                List</x-ui.button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -138,8 +140,9 @@
                             </div>
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">Update Appraisal</button>
-                                <a href="{{ route('appraisals.show', $appraisal) }}" class="btn btn-secondary">Cancel</a>
+                                <x-ui.button variant="primary" type="submit">Update Appraisal</x-ui.button>
+                                <x-ui.button variant="secondary"
+                                    href="{{ route('appraisals.show', $appraisal) }}">Cancel</x-ui.button>
                             </div>
                         </form>
                     </div>

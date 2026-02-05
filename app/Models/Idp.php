@@ -17,6 +17,10 @@ class Idp extends Model
         'revised_description',
         'accomplishment',
         'review_date',
+        'is_approved',
+        'approved_by_id',
+        'approved_at',
+        'approved_by_role',
         'status',
         'signed_by_employee',
         'employee_signed_by_name',
@@ -34,6 +38,8 @@ class Idp extends Model
         'signed_by_manager' => 'boolean',
         'employee_signed_at' => 'datetime',
         'manager_signed_at' => 'datetime',
+        'is_approved' => 'boolean',
+        'approved_at' => 'datetime',
     ];
 
     public function user()
@@ -44,5 +50,10 @@ class Idp extends Model
     public function milestones()
     {
         return $this->hasMany(IdpMilestone::class);
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by_id');
     }
 }

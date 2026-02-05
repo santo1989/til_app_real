@@ -12,7 +12,7 @@
                 <div class="mb-3"><label>Review Date</label><input type="date" name="review_date" class="form-control"
                         required />
                 </div>
-                <button class="btn btn-primary">Save IDP</button>
+                <button class="btn btn-outline-primary">Save IDP</button>
             </form>
             <hr>
             <h6>Your IDPs</h6>
@@ -31,7 +31,8 @@
                             <td>{{ $i + 1 }}</td>
                             <td>{{ $idp->description }}</td>
                             <td>{{ $idp->progress_till_dec ?? 'N/A' }}</td>
-                            <td><a class="btn btn-sm btn-secondary" href="{{ route('idp.edit', $idp) }}">Edit</a></td>
+                            <td><x-ui.button variant="secondary" href="{{ route('idp.edit', $idp) }}"
+                                    class="btn-sm">Edit</x-ui.button></td>
                         </tr>
                     @endforeach
                 </tbody>

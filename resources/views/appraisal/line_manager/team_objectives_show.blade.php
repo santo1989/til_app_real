@@ -65,7 +65,7 @@
             </tr>
         </table>
 
-        <a href="{{ route('team.objectives.edit', $objective) }}" class="btn btn-warning">Edit</a>
-        <a href="{{ route('team.objectives.index') }}" class="btn btn-secondary">Back to List</a>
+        <x-ui.button variant="warning" href="{{ route('team.objectives.edit', $objective) }}">Edit</x-ui.button>
+        <x-ui.button variant="secondary" href="{{ route('team.objectives.index') }}">Back to List</x-ui.button>
     </div>
 @endsection

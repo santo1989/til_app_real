@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Department;
+use App\Models\AuditLog;
 
 class DepartmentController extends Controller
 {
@@ -24,7 +25,14 @@ class DepartmentController extends Controller
             'name' => 'required|string|max:255',
             'head_id' => 'nullable|exists:users,id',
         ]);
-        Department::create($data);
+        $dept = Department::create($data);
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'department_created',
+            'table_name' => 'departments',
+            'record_id' => $dept->id,
+            'details' => "Department created: {$dept->name} (ID {$dept->id})",
+        ]);
         return redirect()->route('departments.index')->with('success', 'Department created successfully');
     }
 
@@ -40,12 +48,28 @@ class DepartmentController extends Controller
             'head_id' => 'nullable|exists:users,id',
         ]);
         $department->update($data);
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'department_updated',
+            'table_name' => 'departments',
+            'record_id' => $department->id,
+            'details' => "Department updated: {$department->name} (ID {$department->id})",
+        ]);
         return redirect()->route('departments.index')->with('success', 'Department updated successfully');
     }
 
     public function destroy(Department $department)
     {
+        $deptId = $department->id;
+        $deptName = $department->name;
         $department->delete();
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'department_deleted',
+            'table_name' => 'departments',
+            'record_id' => $deptId,
+            'details' => "Department deleted: {$deptName} (ID {$deptId})",
+        ]);
         return redirect()->route('departments.index')->with('success', 'Department deleted.');
     }
 }

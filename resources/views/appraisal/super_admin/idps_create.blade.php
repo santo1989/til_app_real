@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>Create IDP (Individual Development Plan)</h4>
-                        <a href="{{ route('idps.index') }}" class="btn btn-secondary">Back to List</a>
+                        <x-ui.button variant="secondary" href="{{ route('idps.index') }}">Back to List</x-ui.button>
                     </div>
                     <div class="card-body">
                         <form method="POST" action="{{ route('idps.store') }}">
@@ -96,8 +96,8 @@
                             </div>
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">Create IDP</button>
-                                <a href="{{ route('idps.index') }}" class="btn btn-secondary">Cancel</a>
+                                <x-ui.button variant="primary" type="submit">Create IDP</x-ui.button>
+                                <x-ui.button variant="secondary" href="{{ route('idps.index') }}">Cancel</x-ui.button>
                             </div>
                         </form>
                     </div>

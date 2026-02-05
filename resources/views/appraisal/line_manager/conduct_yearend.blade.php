@@ -24,7 +24,7 @@
                         @endforeach
                     </tbody>
                 </table>
-                <button class="btn btn-primary">Submit Year-End Review</button>
+                <x-ui.button variant="primary">Submit Year-End Review</x-ui.button>
             </form>
         </div>
     </div>

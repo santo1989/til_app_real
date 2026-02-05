@@ -5,10 +5,10 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="mb-0 text-center">Assessment on Objectives/Targets Achievements</h3>
             @if (isset($appraisal) && $appraisal)
-                <a href="{{ route('appraisals.yearend.pdf', ['appraisal_id' => $appraisal->id]) }}" target="_blank"
-                    class="btn btn-sm btn-danger">
+                <x-ui.button variant="danger" href="{{ route('appraisals.yearend.pdf', ['appraisal_id' => $appraisal->id]) }}"
+                    target="_blank" class="btn-sm">
                     <i class="fas fa-file-pdf"></i> Download PDF
-                </a>
+                </x-ui.button>
                 <div class="ml-2 d-inline-block">
                     <label class="mr-2">Employee Sign:</label>
                     @php $role = 'employee'; @endphp
@@ -131,7 +131,7 @@
                 </table>
             </div>
             <div class="text-end mt-3">
-                <button type="submit" class="btn btn-success">Save Assessment</button>
+                <x-ui.button variant="success" type="submit">Save Assessment</x-ui.button>
             </div>
         </form>
     </div>

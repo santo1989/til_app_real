@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Department;
+use App\Models\AuditLog;
 
 class UserController extends Controller
 {
@@ -13,10 +14,8 @@ class UserController extends Controller
      */
     public function superAdminUserIndex()
     {
-        // Only allow super admin
-        if (auth()->user()->role !== 'super_admin') {
-            abort(403);
-        }
+        // Authorization moved to UserPolicy::viewAny
+        $this->authorize('viewAny', User::class);
         $users = User::with('department')->get();
         return view('appraisal.super_admin.users_index', compact('users'));
     }
@@ -73,6 +72,13 @@ class UserController extends Controller
         }
         $user->fill($data);
         $user->save();
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'profile_updated',
+            'table_name' => 'users',
+            'record_id' => $user->id,
+            'details' => "User profile updated: {$user->name} (ID {$user->id})",
+        ]);
         return redirect()->route('profile.show')->with('success', 'Profile updated successfully');
     }
 
@@ -107,7 +113,14 @@ class UserController extends Controller
         if ($request->hasFile('user_image')) {
             $data['user_image'] = $request->file('user_image')->store('user_images', 'public');
         }
-        User::create($data);
+        $user = User::create($data);
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'user_created',
+            'table_name' => 'users',
+            'record_id' => $user->id,
+            'details' => "User created: {$user->name} ({$user->email}) (ID {$user->id})",
+        ]);
 
         return redirect()->route('users.index')->with('success', 'User created successfully');
     }
@@ -146,12 +159,28 @@ class UserController extends Controller
         /** @var \App\Models\User $user */
         $user->fill($data);
         $user->save();
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'user_updated',
+            'table_name' => 'users',
+            'record_id' => $user->id,
+            'details' => "User updated: {$user->name} ({$user->email}) (ID {$user->id})",
+        ]);
         return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
 
     public function destroy(User $user)
     {
+        $userId = $user->id;
+        $userName = $user->name;
         $user->delete();
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'user_deleted',
+            'table_name' => 'users',
+            'record_id' => $userId,
+            'details' => "User deleted: {$userName} (ID {$userId})",
+        ]);
         return redirect()->route('users.index')->with('success', 'User deleted.');
     }
 
