@@ -12,10 +12,8 @@
                 </button>
             </div>
         </div>
-        <div class="card-body" id="reports-container" 
-             data-auto-refresh="true" 
-             data-refresh-url="{{ route('hr_admin.reports_index') }}"
-             data-refresh-target="#reports-container">
+        <div class="card-body" id="reports-container" data-auto-refresh="true"
+            data-refresh-url="{{ route('hr_admin.reports_index') }}" data-refresh-target="#reports-container">
             <p>Generate exports for appraisals, objectives and IDPs.</p>
             <div class="d-flex gap-2 flex-wrap">
                 <a class="btn btn-outline-primary" href="#">Export Appraisals (PDF)</a>

@@ -26,6 +26,7 @@
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -51,28 +52,28 @@
         border: 1px solid #dee2e6;
         border-radius: 0.25rem;
     }
-    
+
     .table-responsive-custom table {
         font-size: 0.875rem;
     }
-    
+
     .table-responsive-custom th,
     .table-responsive-custom td {
         padding: 0.5rem !important;
     }
-    
+
     /* Hide less important columns on mobile */
     .hide-mobile {
         display: none !important;
     }
-    
+
     /* Stack buttons vertically on mobile */
     .btn-group-mobile {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
     }
-    
+
     .btn-group-mobile .btn {
         width: 100%;
     }
@@ -87,11 +88,11 @@
         text-align: center;
         justify-content: center;
     }
-    
+
     .card {
         margin-bottom: 1rem;
     }
-    
+
     .card-body {
         padding: 1rem;
     }
@@ -153,10 +154,13 @@
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
         transform: scale(1);
     }
+
     50% {
         opacity: 0.5;
         transform: scale(1.2);
@@ -179,12 +183,12 @@
     .form-row {
         flex-direction: column;
     }
-    
+
     .form-inline {
         flex-direction: column;
         align-items: stretch !important;
     }
-    
+
     .form-inline .form-control {
         margin-bottom: 0.5rem;
     }

@@ -13,13 +13,10 @@
                 </button>
             </div>
         </div>
-        <div class="card-body" id="idps-table-container" 
-             data-auto-refresh="true" 
-             data-refresh-url="{{ route('super_admin.idps_index') }}"
-             data-refresh-target="#idps-table-container" id="idps-table-container" 
-             data-auto-refresh="true" 
-             data-refresh-url="{{ route('super_admin.idps_index') }}"
-             data-refresh-target="#idps-table-container">
+        <div class="card-body" id="idps-table-container" data-auto-refresh="true"
+            data-refresh-url="{{ route('super_admin.idps_index') }}" data-refresh-target="#idps-table-container"
+            id="idps-table-container" data-auto-refresh="true" data-refresh-url="{{ route('super_admin.idps_index') }}"
+            data-refresh-target="#idps-table-container">
             <div class="table-responsive-custom">
                 <table class="table table-striped datatable">
                     <thead class="table-light">

@@ -6,12 +6,14 @@
             <h5 class="mb-0"><i class="fas fa-chart-line"></i> All Appraisals</h5>
             <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
                 <span class="auto-refresh-badge">Auto-refresh: 30s</span>
-                <button class="btn btn-sm btn-light" data-manual-refresh="appraisals-table-container" data-refresh-url="{{ route('appraisals.index') }}">
+                <button class="btn btn-sm btn-light" data-manual-refresh="appraisals-table-container"
+                    data-refresh-url="{{ route('appraisals.index') }}">
                     <i class="fas fa-sync-alt"></i> Refresh Now
                 </button>
             </div>
         </div>
-        <div class="card-body" id="appraisals-table-container" data-auto-refresh="true" data-refresh-url="{{ route('appraisals.index') }}" data-refresh-target="appraisals-table-container">
+        <div class="card-body" id="appraisals-table-container" data-auto-refresh="true"
+            data-refresh-url="{{ route('appraisals.index') }}" data-refresh-target="appraisals-table-container">
             <div class="table-responsive-custom">
                 <table class="table table-striped table-hover datatable">
                     <thead class="table-light">
@@ -30,7 +32,8 @@
                             <tr>
                                 <td>{{ $a->id }}</td>
                                 <td class="text-truncate-mobile">{{ $a->user->name ?? 'N/A' }}</td>
-                                <td><span class="badge bg-secondary badge-responsive">{{ str_replace('_', ' ', ucfirst($a->type)) }}</span>
+                                <td><span
+                                        class="badge bg-secondary badge-responsive">{{ str_replace('_', ' ', ucfirst($a->type)) }}</span>
                                 </td>
                                 <td>
                                     <span

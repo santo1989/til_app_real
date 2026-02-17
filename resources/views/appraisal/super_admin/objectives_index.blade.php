@@ -6,12 +6,14 @@
             <h5 class="mb-0"><i class="fas fa-bullseye"></i> All Objectives</h5>
             <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
                 <span class="auto-refresh-badge">Auto-refresh: 30s</span>
-                <button class="btn btn-sm btn-light" data-manual-refresh="objectives-table-container" data-refresh-url="{{ route('objectives.index') }}">
+                <button class="btn btn-sm btn-light" data-manual-refresh="objectives-table-container"
+                    data-refresh-url="{{ route('objectives.index') }}">
                     <i class="fas fa-sync-alt"></i> Refresh Now
                 </button>
             </div>
         </div>
-        <div class="card-body" id="objectives-table-container" data-auto-refresh="true" data-refresh-url="{{ route('objectives.index') }}" data-refresh-target="objectives-table-container">
+        <div class="card-body" id="objectives-table-container" data-auto-refresh="true"
+            data-refresh-url="{{ route('objectives.index') }}" data-refresh-target="objectives-table-container">
             <div class="table-responsive-custom">
                 <table class="table table-striped table-hover datatable">
                     <thead class="table-light">

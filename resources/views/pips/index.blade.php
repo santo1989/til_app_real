@@ -12,10 +12,9 @@
                 </button>
             </div>
         </div>
-        <div class="card-body" id="pips-table-container" 
-             data-auto-refresh="true" 
-             data-refresh-url="{{ route('pips.index') }}?{{ http_build_query(request()->query()) }}"
-             data-refresh-target="#pips-table-container">
+        <div class="card-body" id="pips-table-container" data-auto-refresh="true"
+            data-refresh-url="{{ route('pips.index') }}?{{ http_build_query(request()->query()) }}"
+            data-refresh-target="#pips-table-container">
             <form method="GET" class="form-inline mb-3">
                 <label class="mr-2">Status</label>
                 <select name="status" class="form-control form-control-sm mr-2">
@@ -58,53 +57,55 @@
                 <table class="table table-striped">
                     <thead class="table-light">
                         <tr>
-                        <th>ID</th>
-                        <th>Employee</th>
-                        <th class="hide-mobile">Manager</th>
-                        <th>Status</th>
-                        <th class="hide-mobile">Reason</th>
-                        <th class="hide-mobile">Created</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($pips as $pip)
-                        <tr>
-                            <td>{{ $pip->id }}</td>
-                            <td class="text-truncate-mobile">
-                                @if ($pip->user)
-                                    <a href="{{ route('users.show', $pip->user->id) }}">{{ $pip->user->name }}</a>
-                                @else
-                                    -
-                                @endif
-                            </td>
-                            <td class="hide-mobile">
-                                @if ($pip->user && $pip->user->lineManager)
-                                    <a
-                                        href="{{ route('users.show', $pip->user->lineManager->id) }}">{{ $pip->user->lineManager->name }}</a>
-                                @else
-                                    -
-                                @endif
-                            </td>
-                            <td><span class="badge badge-responsive bg-{{ $pip->status === 'closed' ? 'secondary' : 'warning' }}">{{ $pip->status }}</span></td>
-                            <td class="hide-mobile">{{ $pip->reason }}</td>
-                            <td class="hide-mobile">{{ optional($pip->created_at)->format('d-M-Y') ?? '—' }}</td>
-                            <td>
-                                <div class="btn-group-mobile">
-                                    <a href="{{ route('pips.show', $pip->id) }}"
-                                        class="btn btn-sm btn-outline-primary">View</a>
-                                    @if ($pip->status !== 'closed')
-                                        <form action="{{ route('pips.close', $pip->id) }}" method="POST"
-                                            style="display:inline">@csrf
-                                            <button class="btn btn-sm btn-outline-danger">Close</button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </td>
+                            <th>ID</th>
+                            <th>Employee</th>
+                            <th class="hide-mobile">Manager</th>
+                            <th>Status</th>
+                            <th class="hide-mobile">Reason</th>
+                            <th class="hide-mobile">Created</th>
+                            <th>Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($pips as $pip)
+                            <tr>
+                                <td>{{ $pip->id }}</td>
+                                <td class="text-truncate-mobile">
+                                    @if ($pip->user)
+                                        <a href="{{ route('users.show', $pip->user->id) }}">{{ $pip->user->name }}</a>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td class="hide-mobile">
+                                    @if ($pip->user && $pip->user->lineManager)
+                                        <a
+                                            href="{{ route('users.show', $pip->user->lineManager->id) }}">{{ $pip->user->lineManager->name }}</a>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td><span
+                                        class="badge badge-responsive bg-{{ $pip->status === 'closed' ? 'secondary' : 'warning' }}">{{ $pip->status }}</span>
+                                </td>
+                                <td class="hide-mobile">{{ $pip->reason }}</td>
+                                <td class="hide-mobile">{{ optional($pip->created_at)->format('d-M-Y') ?? '—' }}</td>
+                                <td>
+                                    <div class="btn-group-mobile">
+                                        <a href="{{ route('pips.show', $pip->id) }}"
+                                            class="btn btn-sm btn-outline-primary">View</a>
+                                        @if ($pip->status !== 'closed')
+                                            <form action="{{ route('pips.close', $pip->id) }}" method="POST"
+                                                style="display:inline">@csrf
+                                                <button class="btn btn-sm btn-outline-danger">Close</button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
             <div class="d-flex justify-content-between align-items-center">
                 <div>

@@ -11,15 +11,14 @@
                             <span class="badge bg-light text-dark">
                                 <i class="fas fa-sync-alt"></i> Auto-refresh: 30s
                             </span>
-                            <button class="btn btn-sm btn-outline-light" onclick="AutoRefresh.manualRefresh('reports-container')">
+                            <button class="btn btn-sm btn-outline-light"
+                                onclick="AutoRefresh.manualRefresh('reports-container')">
                                 <i class="fas fa-sync"></i> Refresh
                             </button>
                         </div>
                     </div>
-                    <div class="card-body" id="reports-container" 
-                         data-auto-refresh="true" 
-                         data-refresh-url="{{ route('reports.index') }}"
-                         data-refresh-target="#reports-container">
+                    <div class="card-body" id="reports-container" data-auto-refresh="true"
+                        data-refresh-url="{{ route('reports.index') }}" data-refresh-target="#reports-container">
                         <p class="text-muted">A lightweight reports landing page. Implement detailed reports as needed.</p>
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -34,7 +33,8 @@
                                 <div class="card border-success">
                                     <div class="card-body">
                                         <h6 class="text-muted">Average Total Score</h6>
-                                        <h3 class="mb-0">{{ is_null($avgScore) ? 'N/A' : number_format($avgScore, 2) }}</h3>
+                                        <h3 class="mb-0">{{ is_null($avgScore) ? 'N/A' : number_format($avgScore, 2) }}
+                                        </h3>
                                     </div>
                                 </div>
                             </div>
