@@ -1,10 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>Pending Approvals</h3>
-        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
-    </div>
+    <div class="card card-responsive">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center flex-wrap">
+            <h5 class="mb-0"><i class="fas fa-tasks"></i> Pending Approvals</h5>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-light text-dark">
+                    <i class="fas fa-sync-alt"></i> Auto-refresh: 30s
+                </span>
+                <button class="btn btn-sm btn-outline-light" onclick="AutoRefresh.manualRefresh('approvals-container')">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-light">Back to Dashboard</a>
+            </div>
+        </div>
+        <div class="card-body" id="approvals-container" 
+             data-auto-refresh="true" 
+             data-refresh-url="{{ route('line_manager.approvals') }}?{{ http_build_query(request()->query()) }}"
+             data-refresh-target="#approvals-container">
 
     <form method="GET" class="row g-2 mb-3">
         <div class="col-md-4">
@@ -39,18 +52,19 @@
                 <div class="ms-auto"><small class="text-muted">Selected: <span id="selected-count">0</span></small></div>
             </div>
 
+            <div class="table-responsive-custom">
             <table class="table table-striped">
-                <thead>
+                <thead class="table-light">
                     <tr>
                         <th><input type="checkbox" id="select-all"></th>
                         <th>#</th>
                         <th>Employee</th>
-                        <th>Counts (set / pending / rejected)</th>
-                        <th>Midterm</th>
+                        <th class="hide-mobile">Counts (set / pending / rejected)</th>
+                        <th class="hide-mobile">Midterm</th>
                         <th>Description</th>
-                        <th>Weightage</th>
-                        <th>Target</th>
-                        <th>Submitted At</th>
+                        <th class="hide-mobile">Weightage</th>
+                        <th class="hide-mobile">Target</th>
+                        <th class="hide-mobile">Submitted At</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -59,17 +73,17 @@
                         <tr>
                             <td><input type="checkbox" name="ids[]" value="{{ $obj->id }}" class="select-item"></td>
                             <td>{{ $obj->id }}</td>
-                            <td>
+                            <td class="text-truncate-mobile">
                                 {{ $obj->user?->name ?? 'N/A' }}<br>
                                 <small class="text-muted">{{ $obj->user?->email }}</small>
                             </td>
-                            <td>
+                            <td class="hide-mobile">
                                 @php $c = $counts[$obj->user_id] ?? []; @endphp
-                                <span class="badge bg-success">{{ $c['set'] ?? 0 }}</span>
-                                <span class="badge bg-warning text-dark">{{ $c['pending'] ?? 0 }}</span>
-                                <span class="badge bg-danger">{{ $c['rejected'] ?? 0 }}</span>
+                                <span class="badge badge-responsive bg-success">{{ $c['set'] ?? 0 }}</span>
+                                <span class="badge badge-responsive bg-warning text-dark">{{ $c['pending'] ?? 0 }}</span>
+                                <span class="badge badge-responsive bg-danger">{{ $c['rejected'] ?? 0 }}</span>
                             </td>
-                            <td>
+                            <td class="hide-mobile">
                                 @if (isset($midterm[$obj->user_id]))
                                     <strong>{{ $midterm[$obj->user_id] }}%</strong>
                                 @else
@@ -88,9 +102,9 @@
                                     <div><small class="text-danger">Rejected: {{ $obj->rejection_reason }}</small></div>
                                 @endif
                             </td>
-                            <td>{{ $obj->weightage }}%</td>
-                            <td>{{ $obj->target }}</td>
-                            <td>{{ optional($obj->created_at)->format('Y-m-d H:i') }}</td>
+                            <td class="hide-mobile">{{ $obj->weightage }}%</td>
+                            <td class="hide-mobile">{{ $obj->target }}</td>
+                            <td class="hide-mobile">{{ optional($obj->created_at)->format('Y-m-d H:i') }}</td>
                             <td class="text-end">
                                 <form action="{{ route('objectives.approve', $obj) }}" method="POST"
                                     style="display:inline-block;">
@@ -112,6 +126,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </form>
 
         <div class="d-flex justify-content-center">{{ $pending->links() }}</div>
@@ -260,5 +275,7 @@
                 });
             });
         </script>
+        </div>
+    </div>
     @endif
 @endsection
