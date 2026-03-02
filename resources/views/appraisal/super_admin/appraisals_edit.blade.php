@@ -86,22 +86,27 @@
 
                             <div class="mb-3">
                                 <label for="rating" class="form-label">Rating</label>
+                                @php
+                                    $selectedRating = $appraisal->rating
+                                        ? \App\Support\Rating::toDisplayLabel($appraisal->rating)
+                                        : '';
+                                @endphp
                                 <select name="rating" id="rating"
                                     class="form-control @error('rating') is-invalid @enderror">
                                     <option value="">Not Rated</option>
                                     <option value="Outstanding"
-                                        {{ old('rating', $appraisal->rating) == 'Outstanding' ? 'selected' : '' }}>
+                                        {{ old('rating', $selectedRating) == 'Outstanding' ? 'selected' : '' }}>
                                         Outstanding</option>
                                     <option value="Excellent"
-                                        {{ old('rating', $appraisal->rating) == 'Excellent' ? 'selected' : '' }}>
+                                        {{ old('rating', $selectedRating) == 'Excellent' ? 'selected' : '' }}>
                                         Excellent</option>
                                     <option value="Good"
-                                        {{ old('rating', $appraisal->rating) == 'Good' ? 'selected' : '' }}>Good</option>
+                                        {{ old('rating', $selectedRating) == 'Good' ? 'selected' : '' }}>Good</option>
                                     <option value="Average"
-                                        {{ old('rating', $appraisal->rating) == 'Average' ? 'selected' : '' }}>Average
+                                        {{ old('rating', $selectedRating) == 'Average' ? 'selected' : '' }}>Average
                                     </option>
                                     <option value="Below Average"
-                                        {{ old('rating', $appraisal->rating) == 'Below Average' ? 'selected' : '' }}>Below
+                                        {{ old('rating', $selectedRating) == 'Below Average' ? 'selected' : '' }}>Below
                                         Average
                                     </option>
                                 </select>
@@ -124,15 +129,11 @@
                                 <select name="financial_year" id="financial_year"
                                     class="form-control @error('financial_year') is-invalid @enderror" required>
                                     <option value="">Select Year</option>
-                                    @php
-                                        $start = 2025;
-                                    @endphp
-                                    @for ($i = 0; $i < 11; $i++)
-                                        @php $year = ($start + $i) . '-' . substr($start + $i + 1, -2); @endphp
+                                    @foreach ($years as $year)
                                         <option value="{{ $year }}"
                                             {{ old('financial_year', $appraisal->financial_year) == $year ? 'selected' : '' }}>
                                             {{ $year }}</option>
-                                    @endfor
+                                    @endforeach
                                 </select>
                                 @error('financial_year')
                                     <div class="invalid-feedback">{{ $message }}</div>

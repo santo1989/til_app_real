@@ -24,6 +24,7 @@ use App\Models\MidtermProgress;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Support\Notifier;
 
 /**
  * @mixin User
@@ -382,11 +383,7 @@ class ObjectiveController extends Controller
         ]);
 
         // Send notification to objective owner
-        try {
-            $objective->user->notify(new \App\Notifications\ObjectiveStatusChanged($objective, 'approved', $user));
-        } catch (\Throwable $e) {
-            // Do not fail approval if notification fails. Log if desired.
-        }
+        Notifier::send($objective->user, new \App\Notifications\ObjectiveStatusChanged($objective, 'approved', $user));
 
         // Post-approval: check if approved objectives count meets minimum requirement
         $newCount = Objective::where('user_id', $objective->user_id)
@@ -433,11 +430,7 @@ class ObjectiveController extends Controller
             'details' => "Objective ID {$objective->id} rejected by user {$user->id}. Reason: " . ($reason ?? 'N/A'),
         ]);
 
-        try {
-            $objective->user->notify(new \App\Notifications\ObjectiveStatusChanged($objective, 'rejected', $user, $reason));
-        } catch (\Throwable $e) {
-            // ignore notification failures
-        }
+        Notifier::send($objective->user, new \App\Notifications\ObjectiveStatusChanged($objective, 'rejected', $user, $reason));
 
         return back()->with('success', 'Objective rejected.');
     }
@@ -557,10 +550,7 @@ class ObjectiveController extends Controller
                     'details' => "Objective ID {$o->id} bulk-approved by user {$user->id}",
                 ]);
                 $updated++;
-                try {
-                    $o->user->notify(new \App\Notifications\ObjectiveStatusChanged($o, 'approved', $user));
-                } catch (\Throwable $e) {
-                }
+                Notifier::send($o->user, new \App\Notifications\ObjectiveStatusChanged($o, 'approved', $user));
             }
             DB::commit();
             return back()->with('success', "Bulk approve completed. Approved {$updated} objectives.");
@@ -613,10 +603,7 @@ class ObjectiveController extends Controller
                     'record_id' => $o->id,
                     'details' => "Objective ID {$o->id} bulk-rejected by user {$user->id}. Reason: " . ($reason ?? 'N/A'),
                 ]);
-                try {
-                    $o->user->notify(new \App\Notifications\ObjectiveStatusChanged($o, 'rejected', $user, $reason));
-                } catch (\Throwable $e) {
-                }
+                Notifier::send($o->user, new \App\Notifications\ObjectiveStatusChanged($o, 'rejected', $user, $reason));
                 $updated++;
             }
             DB::commit();

@@ -109,15 +109,11 @@
                                 <select name="financial_year" id="financial_year"
                                     class="form-control @error('financial_year') is-invalid @enderror" required>
                                     <option value="">Select Year</option>
-                                    @php
-                                        $start = 2025;
-                                    @endphp
-                                    @for ($i = 0; $i < 11; $i++)
-                                        @php $year = ($start + $i) . '-' . substr($start + $i + 1, -2); @endphp
+                                    @foreach ($years as $year)
                                         <option value="{{ $year }}"
-                                            {{ old('financial_year', '2025-26') == $year ? 'selected' : '' }}>
+                                            {{ old('financial_year') == $year ? 'selected' : '' }}>
                                             {{ $year }}</option>
-                                    @endfor
+                                    @endforeach
                                 </select>
                                 @error('financial_year')
                                     <div class="invalid-feedback">{{ $message }}</div>

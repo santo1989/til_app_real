@@ -8,15 +8,16 @@
                 <span class="badge bg-light text-dark">
                     <i class="fas fa-sync-alt"></i> Auto-refresh: 30s
                 </span>
-                <button class="btn btn-sm btn-outline-light" onclick="AutoRefresh.manualRefresh('approvals-container')">
+                <button class="btn btn-sm btn-outline-light" data-manual-refresh="approvals-container"
+                    data-refresh-url="{{ route('objectives.approvals') }}">
                     <i class="fas fa-sync"></i> Refresh
                 </button>
                 <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-light">Back to Dashboard</a>
             </div>
         </div>
         <div class="card-body" id="approvals-container" data-auto-refresh="true"
-            data-refresh-url="{{ route('line_manager.approvals') }}?{{ http_build_query(request()->query()) }}"
-            data-refresh-target="#approvals-container">
+            data-refresh-url="{{ route('objectives.approvals') }}?{{ http_build_query(request()->query()) }}"
+            data-refresh-target="approvals-container">
 
             <form method="GET" class="row g-2 mb-3">
                 <div class="col-md-4">
@@ -96,7 +97,8 @@
                                                 <button class="btn btn-sm btn-outline-primary record-midterm-btn"
                                                     data-user-id="{{ $obj->user_id }}"
                                                     data-objective-id="{{ $obj->id }}"
-                                                    data-fy="{{ $obj->financial_year }}">
+                                                    data-fy="{{ $obj->financial_year }}"
+                                                    @cannot('viewMidterm', $obj->user) disabled @endcannot>
                                                     Record
                                                 </button>
                                             </div>
@@ -114,11 +116,16 @@
                                             <form action="{{ route('objectives.approve', $obj) }}" method="POST"
                                                 style="display:inline-block;">
                                                 @csrf
-                                                <button type="submit"
-                                                    class="btn btn-sm btn-outline-success">Approve</button>
+                                                <button type="submit" class="btn btn-sm btn-outline-success"
+                                                    @cannot('approve', $obj) disabled @endcannot>
+                                                    Approve
+                                                </button>
                                             </form>
                                             <button class="btn btn-sm btn-outline-danger" data-bs-toggle="collapse"
-                                                data-bs-target="#reject-form-{{ $obj->id }}">Reject</button>
+                                                data-bs-target="#reject-form-{{ $obj->id }}"
+                                                @cannot('reject', $obj) disabled @endcannot>
+                                                Reject
+                                            </button>
                                             <div class="collapse mt-2" id="reject-form-{{ $obj->id }}">
                                                 <form action="{{ route('objectives.reject', $obj) }}" method="POST"
                                                     class="d-flex">
@@ -126,7 +133,9 @@
                                                     <input type="text" name="reason"
                                                         class="form-control form-control-sm me-2"
                                                         placeholder="Reason (optional)">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Confirm
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        @cannot('reject', $obj) disabled @endcannot>
+                                                        Confirm
                                                         Reject</button>
                                                 </form>
                                             </div>

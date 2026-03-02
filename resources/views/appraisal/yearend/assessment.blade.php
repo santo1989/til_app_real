@@ -41,6 +41,11 @@
             following format and shared by the Board with the respective Department Heads/Team Lead. The line managers will
             cascade down the same through the line managers. These achievements will be same for each of the employees in
             the Department/ Team.</p>
+        @php
+            $canSave = $teamObjectives
+                ->concat($individualObjectives)
+                ->contains(fn($o) => \Illuminate\Support\Facades\Gate::allows('enterAchieved', $o));
+        @endphp
         <form method="POST" action="{{ route('appraisal.yearend.assessment.save', $employee->id) }}">
             @csrf
             <div class="table-responsive">
@@ -67,12 +72,14 @@
                                         value="{{ $obj->id }}">
                                     <input type="number" name="teamObjectives[{{ $i }}][target_achieved]"
                                         step="0.01" min="0" max="1" class="form-control"
-                                        value="{{ $obj->target_achieved ?? '' }}">
+                                        value="{{ $obj->target_achieved ?? '' }}"
+                                        @cannot('enterAchieved', $obj) disabled @endcannot>
                                 </td>
                                 <td>
                                     <input type="number" name="teamObjectives[{{ $i }}][final_score]"
                                         step="0.01" min="0" max="100" class="form-control"
-                                        value="{{ $obj->final_score ?? '' }}">
+                                        value="{{ $obj->final_score ?? '' }}"
+                                        @cannot('enterAchieved', $obj) disabled @endcannot>
                                 </td>
                             </tr>
                         @empty
@@ -114,12 +121,14 @@
                                         value="{{ $obj->id }}">
                                     <input type="number" name="individualObjectives[{{ $i }}][target_achieved]"
                                         step="0.01" min="0" max="1" class="form-control"
-                                        value="{{ $obj->target_achieved ?? '' }}">
+                                        value="{{ $obj->target_achieved ?? '' }}"
+                                        @cannot('enterAchieved', $obj) disabled @endcannot>
                                 </td>
                                 <td>
                                     <input type="number" name="individualObjectives[{{ $i }}][final_score]"
                                         step="0.01" min="0" max="100" class="form-control"
-                                        value="{{ $obj->final_score ?? '' }}">
+                                        value="{{ $obj->final_score ?? '' }}"
+                                        @cannot('enterAchieved', $obj) disabled @endcannot>
                                 </td>
                             </tr>
                         @empty
@@ -131,7 +140,12 @@
                 </table>
             </div>
             <div class="text-end mt-3">
-                <x-ui.button variant="success" type="submit">Save Assessment</x-ui.button>
+                <x-ui.button variant="success" type="submit" @unless ($canSave) disabled @endunless>
+                    Save Assessment
+                </x-ui.button>
+                @unless ($canSave)
+                    <div class="text-muted small mt-2">Editing is locked by policy or timeline rules.</div>
+                @endunless
             </div>
         </form>
     </div>

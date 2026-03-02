@@ -25,19 +25,20 @@ class YearEndCompleteWorkflowTest extends TestCase
         ]);
 
         $manager = User::factory()->create(['role' => 'line_manager']);
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
         $employee = User::factory()->create(['role' => 'employee', 'line_manager_id' => $manager->id]);
 
-        return [$fy, $manager, $employee];
+        return [$fy, $manager, $employee, $superAdmin];
     }
 
     public function test_below_60_triggers_pip_auto_creation_and_audit_log()
     {
-        [$fy, $manager, $employee] = $this->createFyAndManagerAndEmployee();
+        [$fy, $manager, $employee, $superAdmin] = $this->createFyAndManagerAndEmployee();
 
         $o1 = Objective::create(['user_id' => $employee->id, 'type' => 'individual', 'description' => 'O1', 'weightage' => 50, 'financial_year' => $fy->label, 'created_by' => $manager->id]);
         $o2 = Objective::create(['user_id' => $employee->id, 'type' => 'individual', 'description' => 'O2', 'weightage' => 50, 'financial_year' => $fy->label, 'created_by' => $manager->id]);
 
-        $this->actingAs($manager)
+        $this->actingAs($superAdmin)
             ->post(route('appraisals.conduct_yearend.submit', ['user_id' => $employee->id]), [
                 'achievements' => [
                     ['id' => $o1->id, 'score' => 50, 'rating' => 0],
@@ -64,12 +65,12 @@ class YearEndCompleteWorkflowTest extends TestCase
 
     public function test_signing_sequence_enforcement_and_order_validation()
     {
-        [$fy, $manager, $employee] = $this->createFyAndManagerAndEmployee();
+        [$fy, $manager, $employee, $superAdmin] = $this->createFyAndManagerAndEmployee();
 
         $o = Objective::create(['user_id' => $employee->id, 'type' => 'individual', 'description' => 'O', 'weightage' => 100, 'financial_year' => $fy->label, 'created_by' => $manager->id]);
 
         // Create appraisal via year-end submit
-        $this->actingAs($manager)
+        $this->actingAs($superAdmin)
             ->post(route('appraisals.conduct_yearend.submit', ['user_id' => $employee->id]), [
                 'achievements' => [['id' => $o->id, 'score' => 95, 'rating' => 0]],
             ]);
@@ -122,13 +123,13 @@ class YearEndCompleteWorkflowTest extends TestCase
 
     public function test_employee_refusing_to_sign_and_manager_overriding_scores_and_multiple_revisions()
     {
-        [$fy, $manager, $employee] = $this->createFyAndManagerAndEmployee();
+        [$fy, $manager, $employee, $superAdmin] = $this->createFyAndManagerAndEmployee();
 
         $o1 = Objective::create(['user_id' => $employee->id, 'type' => 'individual', 'description' => 'O1', 'weightage' => 50, 'financial_year' => $fy->label, 'created_by' => $manager->id]);
         $o2 = Objective::create(['user_id' => $employee->id, 'type' => 'individual', 'description' => 'O2', 'weightage' => 50, 'financial_year' => $fy->label, 'created_by' => $manager->id]);
 
         // First submission: low -> creates PIP
-        $this->actingAs($manager)->post(route('appraisals.conduct_yearend.submit', ['user_id' => $employee->id]), [
+        $this->actingAs($superAdmin)->post(route('appraisals.conduct_yearend.submit', ['user_id' => $employee->id]), [
             'achievements' => [['id' => $o1->id, 'score' => 40, 'rating' => 0], ['id' => $o2->id, 'score' => 40, 'rating' => 0]],
         ]);
 
@@ -141,7 +142,7 @@ class YearEndCompleteWorkflowTest extends TestCase
 
         // Manager decides to override/update scores and re-submit a better appraisal
         // Simulate manager updating objective target_achieved and creating a new appraisal by re-submitting
-        $this->actingAs($manager)->post(route('appraisals.conduct_yearend.submit', ['user_id' => $employee->id]), [
+        $this->actingAs($superAdmin)->post(route('appraisals.conduct_yearend.submit', ['user_id' => $employee->id]), [
             'achievements' => [['id' => $o1->id, 'score' => 85, 'rating' => 0], ['id' => $o2->id, 'score' => 90, 'rating' => 0]],
         ]);
 
@@ -151,7 +152,7 @@ class YearEndCompleteWorkflowTest extends TestCase
         $this->assertNotEquals('below', $latest->rating);
 
         // Multiple revisions: manager resubmits again keeping improvements
-        $this->actingAs($manager)->post(route('appraisals.conduct_yearend.submit', ['user_id' => $employee->id]), [
+        $this->actingAs($superAdmin)->post(route('appraisals.conduct_yearend.submit', ['user_id' => $employee->id]), [
             'achievements' => [['id' => $o1->id, 'score' => 88, 'rating' => 0], ['id' => $o2->id, 'score' => 92, 'rating' => 0]],
         ]);
 

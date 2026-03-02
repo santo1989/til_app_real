@@ -14,7 +14,7 @@ class PipController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(\App\Models\Pip::class, 'pip');
+        $this->authorizeResource(Pip::class, 'pip');
     }
 
     public function index()

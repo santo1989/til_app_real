@@ -16,13 +16,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($objectives as $obj)
+                        @foreach ($objectives as $i => $obj)
                             <tr>
                                 <td>{{ $obj->description }}</td>
-                                <td><input type="number" name="achievements[][score]" class="form-control" required
-                                        min="0" max="100" /></td>
-                                <td><input type="number" name="achievements[][weight]" value="{{ $obj->weightage }}"
-                                        class="form-control" required min="10" max="25" step="5" /></td>
+                                <td>
+                                    <input type="hidden" name="achievements[{{ $i }}][id]"
+                                        value="{{ $obj->id }}" />
+                                    <input type="number" name="achievements[{{ $i }}][score]"
+                                        class="form-control achievement-score" required min="0" max="100" />
+                                </td>
+                                <td>
+                                    <input type="hidden" name="achievements[{{ $i }}][weight]"
+                                        value="{{ $obj->weightage }}" class="achievement-weight" />
+                                    <span class="form-control-plaintext">{{ $obj->weightage }}</span>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -34,11 +41,11 @@
         </div>
     </div>
     <script>
-        $('input[name="achievements[][score]"]').on('input', function() {
+        $('.achievement-score').on('input', function() {
             let total = 0;
             $('table tbody tr').each(function() {
-                const score = Number($(this).find('input[name="achievements[][score]"]').val()) || 0;
-                const weight = Number($(this).find('input[name="achievements[][weight]"]').val()) || 0;
+                const score = Number($(this).find('.achievement-score').val()) || 0;
+                const weight = Number($(this).find('.achievement-weight').val()) || 0;
                 total += (score * weight) / 100;
             });
             $('#total').text(total.toFixed(2));

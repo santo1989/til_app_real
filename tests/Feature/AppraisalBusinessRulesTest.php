@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use App\Models\Objective;
+use App\Models\FinancialYear;
 
 class AppraisalBusinessRulesTest extends TestCase
 {
@@ -13,60 +14,81 @@ class AppraisalBusinessRulesTest extends TestCase
 
     public function test_yearend_rating_thresholds(): void
     {
-        $this->seed();
-        $user = User::where('role', 'employee')->first();
+        $user = User::factory()->create(['role' => 'super_admin']);
         $this->actingAs($user);
 
-        $objectives = [
-            ['score' => 85, 'weight' => 25],
-            ['score' => 82, 'weight' => 25],
-            ['score' => 80, 'weight' => 25],
-            ['score' => 80, 'weight' => 25],
+        $fy = FinancialYear::create([
+            'label' => '2025-26',
+            'start_date' => now()->startOfYear()->toDateString(),
+            'end_date' => now()->endOfYear()->toDateString(),
+            'is_active' => true,
+        ]);
+        $activeFY = $fy->label;
+
+        $objectives = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $objectives[] = Objective::create([
+                'user_id' => $user->id,
+                'type' => 'individual',
+                'description' => "Objective {$i}",
+                'weightage' => 25,
+                'target' => "Target {$i}",
+                'status' => 'set',
+                'financial_year' => $activeFY,
+                'created_by' => $user->id,
+            ]);
+        }
+
+        $payload = [
+            ['id' => $objectives[0]->id, 'score' => 85],
+            ['id' => $objectives[1]->id, 'score' => 82],
+            ['id' => $objectives[2]->id, 'score' => 80],
+            ['id' => $objectives[3]->id, 'score' => 80],
         ];
         $resp = $this->post(route('appraisals.yearend.submit'), [
-            'achievements' => $objectives,
+            'achievements' => $payload,
             'comments' => 'Test',
         ]);
         $resp->assertSessionDoesntHaveErrors();
         $resp->assertRedirect(route('appraisals.yearend'));
         // Outstanding: all >=80
 
-        $objectives = [
-            ['score' => 65, 'weight' => 25],
-            ['score' => 62, 'weight' => 25],
-            ['score' => 60, 'weight' => 25],
-            ['score' => 60, 'weight' => 25],
+        $payload = [
+            ['id' => $objectives[0]->id, 'score' => 65],
+            ['id' => $objectives[1]->id, 'score' => 62],
+            ['id' => $objectives[2]->id, 'score' => 60],
+            ['id' => $objectives[3]->id, 'score' => 60],
         ];
         $resp = $this->post(route('appraisals.yearend.submit'), [
-            'achievements' => $objectives,
+            'achievements' => $payload,
             'comments' => 'Test',
         ]);
         $resp->assertSessionDoesntHaveErrors();
         $resp->assertRedirect(route('appraisals.yearend'));
         // Good: all >=60
 
-        $objectives = [
-            ['score' => 45, 'weight' => 25],
-            ['score' => 42, 'weight' => 25],
-            ['score' => 40, 'weight' => 25],
-            ['score' => 40, 'weight' => 25],
+        $payload = [
+            ['id' => $objectives[0]->id, 'score' => 45],
+            ['id' => $objectives[1]->id, 'score' => 42],
+            ['id' => $objectives[2]->id, 'score' => 40],
+            ['id' => $objectives[3]->id, 'score' => 40],
         ];
         $resp = $this->post(route('appraisals.yearend.submit'), [
-            'achievements' => $objectives,
+            'achievements' => $payload,
             'comments' => 'Test',
         ]);
         $resp->assertSessionDoesntHaveErrors();
         $resp->assertRedirect(route('appraisals.yearend'));
         // Average: all >=40
 
-        $objectives = [
-            ['score' => 35, 'weight' => 25],
-            ['score' => 32, 'weight' => 25],
-            ['score' => 30, 'weight' => 25],
-            ['score' => 30, 'weight' => 25],
+        $payload = [
+            ['id' => $objectives[0]->id, 'score' => 35],
+            ['id' => $objectives[1]->id, 'score' => 32],
+            ['id' => $objectives[2]->id, 'score' => 30],
+            ['id' => $objectives[3]->id, 'score' => 30],
         ];
         $resp = $this->post(route('appraisals.yearend.submit'), [
-            'achievements' => $objectives,
+            'achievements' => $payload,
             'comments' => 'Test',
         ]);
         $resp->assertSessionDoesntHaveErrors();

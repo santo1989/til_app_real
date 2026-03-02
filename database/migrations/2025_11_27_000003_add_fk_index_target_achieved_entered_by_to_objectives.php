@@ -28,7 +28,8 @@ return new class extends Migration
                 $table->foreign('target_achieved_entered_by', $fkName)
                     ->references('id')
                     ->on('users')
-                    ->onDelete('set null');
+                    // SQL Server blocks multiple cascading paths; use NO ACTION to avoid cycles
+                    ->onDelete('no action');
             } catch (\Throwable $e) {
                 // ignore if foreign key exists or DB doesn't support it
             }

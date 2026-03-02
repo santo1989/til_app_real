@@ -144,13 +144,18 @@ class ObjectivePolicy
         // Super and HR can always enter/edit achieved values
         if ($user->isSuperAdmin() || $user->isHrAdmin()) return true;
 
+        // Employees may enter their own achievement values for self-assessment
+        if ($user->role === 'employee' && $objective->user_id === $user->id) {
+            return true;
+        }
+
         // Line managers can enter achieved for their direct reports
         if ($user->isLineManager()) {
             if ($objective->user && $objective->user->line_manager_id === $user->id) {
                 // If an achieved value already exists and was entered by a line manager,
                 // only HR or SuperAdmin may change it per business rules.
                 if (!empty($objective->target_achieved_entered_by)) {
-                    $enterer = \App\Models\User::find($objective->target_achieved_entered_by);
+                    $enterer = User::find($objective->target_achieved_entered_by);
                     if ($enterer && $enterer->role === 'line_manager') {
                         return false; // only HR/SuperAdmin can edit after manager entry
                     }

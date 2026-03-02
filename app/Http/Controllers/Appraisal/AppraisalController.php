@@ -30,7 +30,8 @@ class AppraisalController extends Controller
     public function create()
     {
         $users = User::all();
-        return view('appraisal.super_admin.appraisals_create', compact('users'));
+        $years = FinancialYear::orderBy('start_date')->pluck('label')->toArray();
+        return view('appraisal.super_admin.appraisals_create', compact('users', 'years'));
     }
 
     /**
@@ -41,8 +42,6 @@ class AppraisalController extends Controller
         $employee = User::findOrFail($user_id);
         // Ensure we always pass a string to downstream services; cast to string so
         // computeUserScores won't receive null during tests when no active FY exists.
-        $activeFY = (string) FinancialYear::getActiveName();
-        // Cast to string to avoid null being persisted into DB in test contexts
         $activeFY = (string) FinancialYear::getActiveName();
 
         $teamObjectives = Objective::where('department_id', $employee->department_id)
@@ -133,7 +132,8 @@ class AppraisalController extends Controller
     public function edit(Appraisal $appraisal)
     {
         $users = User::all();
-        return view('appraisal.super_admin.appraisals_edit', compact('appraisal', 'users'));
+        $years = FinancialYear::orderBy('start_date')->pluck('label')->toArray();
+        return view('appraisal.super_admin.appraisals_edit', compact('appraisal', 'users', 'years'));
     }
     public function update(Request $request, Appraisal $appraisal)
     {
@@ -187,7 +187,17 @@ class AppraisalController extends Controller
         $activeModel = FinancialYear::getActive();
         $activeFY = $activeModel ? (new FinancialYearService($activeModel))->label() : FinancialYear::getActiveName();
         $objectives = $user->objectives()->where('financial_year', $activeFY)->get();
-        return view('appraisal.midterm.index', compact('objectives', 'activeFY'));
+        $appraisal = Appraisal::firstOrCreate([
+            'user_id' => $user->id,
+            'type' => 'midterm',
+            'financial_year' => $activeFY,
+        ], [
+            'date' => now(),
+            'status' => 'in_progress',
+            'conducted_by' => $user->id,
+        ]);
+
+        return view('appraisal.midterm.index', compact('objectives', 'activeFY', 'appraisal'));
     }
 
     public function midtermSubmit(Request $request)
@@ -261,17 +271,15 @@ class AppraisalController extends Controller
     {
         $request->validate([
             'achievements' => 'required|array|min:1',
+            'achievements.*.id' => 'required|integer|exists:objectives,id',
             'achievements.*.score' => 'required|numeric|min:0|max:100',
-            'achievements.*.weight' => 'required|integer|in:10,15,20,25',
             'comments' => 'nullable|string',
             'supervisor_comments' => 'nullable|string'
         ]);
 
         $activeFY = FinancialYear::getActiveName();
         if (empty($activeFY)) {
-            // Fallback: if no active FY is configured in the test DB, pick any existing FY label
-            $anyFy = FinancialYear::first();
-            $activeFY = $anyFy?->label ?? '2025-26';
+            return back()->withErrors(['financial_year' => 'No active financial year found. Please activate a financial year before submitting a year-end appraisal.']);
         }
         $activeFY = (string) $activeFY;
 
@@ -279,8 +287,10 @@ class AppraisalController extends Controller
         foreach ($request->input('achievements', []) as $a) {
             $obj = Objective::find($a['id'] ?? null);
             if ($obj) {
-                // Authorization: ensure caller may enter/modify achieved value for this objective
-                $this->authorize('enterAchieved', $obj);
+                // Authorization: employees may enter their own achievements; otherwise use policy
+                if (auth()->user()->role !== 'employee' || $obj->user_id !== auth()->id()) {
+                    $this->authorize('enterAchieved', $obj);
+                }
 
                 $obj->target_achieved = floatval($a['score']);
                 if (!is_null($a['score'])) {
@@ -364,6 +374,9 @@ class AppraisalController extends Controller
     public function conductMidterm(Request $request, $user_id)
     {
         $employee = User::findOrFail($user_id);
+        if (!auth()->user()->isSuperAdmin() && !auth()->user()->isHrAdmin() && $employee->line_manager_id !== auth()->id()) {
+            abort(403);
+        }
         $activeModel = FinancialYear::getActive();
         $activeFY = $activeModel ? (new FinancialYearService($activeModel))->label() : FinancialYear::getActiveName();
         $objectives = $employee->objectives()->where('financial_year', $activeFY)->get();
@@ -399,6 +412,9 @@ class AppraisalController extends Controller
             'reviews.*.comment' => 'nullable|string',
         ]);
         $employee = User::findOrFail($user_id);
+        if (!auth()->user()->isSuperAdmin() && !auth()->user()->isHrAdmin() && $employee->line_manager_id !== auth()->id()) {
+            abort(403);
+        }
         $activeModel = FinancialYear::getActive();
         if ($activeModel) {
             $fyService = new FinancialYearService($activeModel);
@@ -429,6 +445,10 @@ class AppraisalController extends Controller
             // map objective id to a rating key structure
             // if front-end sends reviews by index, ensure objective id is sent
             $objId = $rev['id'] ?? $idx;
+            $obj = Objective::find($objId);
+            if (!$obj || $obj->user_id !== $employee->id) {
+                return back()->withErrors(['reviews' => 'One or more objectives do not belong to this employee.']);
+            }
             $ratings[$objId] = [
                 'score' => $rev['score'],
                 'comment' => $rev['comment'] ?? null,
@@ -540,7 +560,13 @@ class AppraisalController extends Controller
     public function conductYearEnd(Request $request, $user_id)
     {
         $employee = User::findOrFail($user_id);
+        if (!auth()->user()->isSuperAdmin() && !auth()->user()->isHrAdmin() && $employee->line_manager_id !== auth()->id()) {
+            abort(403);
+        }
         $activeFY = FinancialYear::getActiveName();
+        if (empty($activeFY)) {
+            return back()->withErrors(['financial_year' => 'No active financial year found. Please activate a financial year before conducting year-end reviews.']);
+        }
         $objectives = $employee->objectives()->where('financial_year', $activeFY)->get();
         return view('appraisal.line_manager.conduct_yearend', compact('employee', 'objectives', 'activeFY'));
     }
@@ -549,19 +575,40 @@ class AppraisalController extends Controller
     {
         $request->validate([
             'achievements' => 'required|array|min:1',
+            'achievements.*.id' => 'required|integer|exists:objectives,id',
             'achievements.*.score' => 'required|numeric|min:0|max:100',
             'achievements.*.rating' => 'required|numeric|min:0|max:100',
             'supervisor_comments' => 'nullable|string',
         ]);
         $employee = User::findOrFail($user_id);
+        if (!auth()->user()->isSuperAdmin() && !auth()->user()->isHrAdmin() && $employee->line_manager_id !== auth()->id()) {
+            abort(403);
+        }
         $activeFY = FinancialYear::getActiveName();
+        if (empty($activeFY)) {
+            return back()->withErrors(['financial_year' => 'No active financial year found. Please activate a financial year before conducting year-end reviews.']);
+        }
 
         // Persist per-objective achievements as sent in request
         foreach ($request->input('achievements', []) as $a) {
             $obj = Objective::find($a['id'] ?? null);
             if ($obj) {
-                // Authorization: ensure caller may enter/modify achieved value for this objective
-                $this->authorize('enterAchieved', $obj);
+                if ($obj->user_id !== $employee->id || $obj->financial_year !== $activeFY) {
+                    return back()->withErrors(['achievements' => 'One or more objectives do not belong to this employee or financial year.']);
+                }
+                // Authorization: super admins and HR admins can always enter
+                if (!auth()->user()->isSuperAdmin() && !auth()->user()->isHrAdmin()) {
+                    // Line managers can enter for their direct reports
+                    if (auth()->user()->isLineManager()) {
+                        $obj->load('user'); // ensure user relationship is loaded
+                        if (!$obj->user || $obj->user->line_manager_id !== auth()->id()) {
+                            $this->authorize('enterAchieved', $obj);
+                        }
+                    } else {
+                        // All other roles must pass policy check
+                        $this->authorize('enterAchieved', $obj);
+                    }
+                }
 
                 $obj->target_achieved = floatval($a['score']);
                 if (!is_null($a['score'])) {
@@ -579,8 +626,7 @@ class AppraisalController extends Controller
         // Ensure a string is passed to computeUserScores. If the request didn't include
         // a financial_year, try to use the active financial year label. Cast to string
         // to avoid a TypeError when tests or callers omit the value.
-        $financialYearLabel = $activeFY;
-        $scores = (new \App\Services\PerformanceService())->computeUserScores($employee->id, (string) $financialYearLabel);
+        $scores = (new PerformanceService())->computeUserScores($employee->id, (string) $activeFY);
 
         $ratingCode = $this->normalizeRatingToDb($scores['status']);
 
@@ -965,12 +1011,39 @@ class AppraisalController extends Controller
      * route does not throw when requested. More detailed reports can be
      * implemented later and placed under a reports/ directory.
      */
-    public function reports()
+    public function reports(Request $request)
     {
-        // Basic aggregates for the HR reports landing page
+        $query = Appraisal::with('user');
+        $q = $request->get('q');
+        $fy = $request->get('fy');
+        $type = $request->get('type');
+        $status = $request->get('status');
+        $rating = $request->get('rating');
+
+        if (!empty($q)) {
+            $query->whereHas('user', function ($uq) use ($q) {
+                $uq->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%");
+            });
+        }
+        if (!empty($fy)) {
+            $query->where('financial_year', $fy);
+        }
+        if (!empty($type)) {
+            $query->where('type', $type);
+        }
+        if (!empty($status)) {
+            $query->where('status', $status);
+        }
+        if (!empty($rating)) {
+            $query->where('rating', $rating);
+        }
+
+        $appraisals = $query->orderByDesc('id')->paginate(25)->appends($request->query());
+        $years = FinancialYear::orderBy('start_date')->pluck('label')->toArray();
         $totalAppraisals = Appraisal::count();
         $avgScore = Appraisal::whereNotNull('total_score')->avg('total_score');
 
-        return view('reports.index', compact('totalAppraisals', 'avgScore'));
+        return view('appraisal.hr_admin.reports_index', compact('appraisals', 'years', 'totalAppraisals', 'avgScore'));
     }
 }

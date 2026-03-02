@@ -56,7 +56,13 @@
                 <button type="submit" id="save-btn" class="btn btn-outline-primary" disabled>Save</button>
             </form>
             @include('appraisal.partials.smart_help', ['id' => 'is-smart-global-help'])
-            <div class="mt-2">Total objectives allowed: 3–6. Weightages must sum to 70%.</div>
+            @php
+                $indMin = (int) config('appraisal.individual_min', 3);
+                $indMax = (int) config('appraisal.individual_max', 6);
+                $indTotal = (int) config('appraisal.individual_total', 70);
+            @endphp
+            <div class="mt-2">Total objectives allowed: {{ $indMin }}–{{ $indMax }}. Weightages must sum to
+                {{ $indTotal }}%.</div>
         </div>
     </div>
     <script>
@@ -66,6 +72,9 @@
                 return;
             }
             let idx = {{ count($objectives) }};
+            const requiredTotal = {{ (int) config('appraisal.individual_total', 70) }};
+            const minCount = {{ (int) config('appraisal.individual_min', 3) }};
+            const maxCount = {{ (int) config('appraisal.individual_max', 6) }};
 
             function updateValidation() {
                 const rows = $('#objectives-body tr');
@@ -75,14 +84,14 @@
                     const weight = parseInt($(this).find('select[name*="weightage"]').val(), 10);
                     if (!isNaN(weight)) total += weight;
                 });
-                // enforce count 3..6
-                if (rows.length < 3 || rows.length > 6) valid = false;
-                // enforce total 70 for individual-only page
-                if (total !== 70) valid = false;
+                // enforce configured count range
+                if (rows.length < minCount || rows.length > maxCount) valid = false;
+                // enforce configured total for individual-only page
+                if (total !== requiredTotal) valid = false;
                 $('#save-btn').prop('disabled', !valid);
 
-                // disable Add when we've reached max count OR total weight already equals/exceeds 70
-                const disableAdd = rows.length >= 6 || total >= 70;
+                // disable Add when we've reached max count OR total weight already equals/exceeds required total
+                const disableAdd = rows.length >= maxCount || total >= requiredTotal;
                 $('#add-row').prop('disabled', disableAdd);
 
                 // toggle global help if any SMART checkbox is checked

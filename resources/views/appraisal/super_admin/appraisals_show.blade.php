@@ -59,10 +59,12 @@
                                                 'good' => 'bg-primary',
                                                 'average' => 'bg-warning',
                                                 'below average' => 'bg-danger',
+                                                'below' => 'bg-danger',
                                                 default => 'bg-secondary',
                                             };
+                                            $displayRating = \App\Support\Rating::toDisplayLabel($appraisal->rating);
                                         @endphp
-                                        <span class="badge {{ $badgeClass }}">{{ $appraisal->rating }}</span>
+                                        <span class="badge {{ $badgeClass }}">{{ $displayRating }}</span>
                                     @else
                                         N/A
                                     @endif

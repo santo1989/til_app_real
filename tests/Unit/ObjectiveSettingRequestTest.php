@@ -25,14 +25,16 @@ class ObjectiveSettingRequestTest extends TestCase
             'objectives' => [
                 ['type' => 'individual', 'description' => 'Obj 1', 'weightage' => 25, 'target' => 'Do A'],
                 ['type' => 'individual', 'description' => 'Obj 2', 'weightage' => 25, 'target' => 'Do B'],
-                ['type' => 'individual', 'description' => 'Obj 3', 'weightage' => 25, 'target' => 'Do C'],
-                ['type' => 'individual', 'description' => 'Obj 4', 'weightage' => 25, 'target' => 'Do D'],
+                ['type' => 'individual', 'description' => 'Obj 3', 'weightage' => 20, 'target' => 'Do C'],
             ],
         ];
 
         $req = new ObjectiveSettingRequest();
         // populate request data as if submitted
         $req->replace($data);
+        $prepare = new \ReflectionMethod($req, 'prepareForValidation');
+        $prepare->setAccessible(true);
+        $prepare->invoke($req);
 
         $validator = $this->app['validator']->make($req->all(), $req->rules());
         // register after callbacks from the request
@@ -54,13 +56,15 @@ class ObjectiveSettingRequestTest extends TestCase
             'objectives' => [
                 ['type' => 'individual', 'description' => 'Obj 1', 'weightage' => 25, 'target' => 'Do A'],
                 ['type' => 'individual', 'description' => 'Obj 2', 'weightage' => 25, 'target' => 'Do B'],
-                ['type' => 'individual', 'description' => 'Obj 3', 'weightage' => 25, 'target' => 'Do C'],
-                ['type' => 'individual', 'description' => 'Obj 4', 'weightage' => 25, 'target' => 'Do D'],
+                ['type' => 'individual', 'description' => 'Obj 3', 'weightage' => 20, 'target' => 'Do C'],
             ],
         ];
 
         $req = new ObjectiveSettingRequest();
         $req->replace($data);
+        $prepare = new \ReflectionMethod($req, 'prepareForValidation');
+        $prepare->setAccessible(true);
+        $prepare->invoke($req);
 
         $validator = $this->app['validator']->make($req->all(), $req->rules());
         $req->withValidator($validator);

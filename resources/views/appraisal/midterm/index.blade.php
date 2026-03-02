@@ -28,8 +28,12 @@
                         @foreach ($objectives as $i => $obj)
                             <tr>
                                 <td>{{ $obj->description }}</td>
-                                <td><input type="number" name="achievements[{{ $i }}][score]"
-                                        class="form-control" required min="0" max="100" /></td>
+                                <td>
+                                    <input type="hidden" name="achievements[{{ $i }}][id]"
+                                        value="{{ $obj->id }}" />
+                                    <input type="number" name="achievements[{{ $i }}][score]"
+                                        class="form-control" required min="0" max="100" />
+                                </td>
                                 <td><input type="text" name="achievements[{{ $i }}][comment]"
                                         class="form-control" /></td>
                             </tr>

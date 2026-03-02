@@ -17,7 +17,8 @@ return new class extends Migration
             }
             if (Schema::hasColumn('objectives', 'approved_by')) {
                 try {
-                    $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
+                    // SQL Server blocks multiple cascading paths; use NO ACTION to avoid cycles
+                    $table->foreign('approved_by')->references('id')->on('users')->onDelete('no action');
                 } catch (\Throwable $e) {
                     // ignore if FK exists or DB doesn't support
                 }

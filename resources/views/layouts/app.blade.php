@@ -47,7 +47,7 @@
                                     @endif
                                 @endcan
 
-                                @can('viewMidterm', auth()->user())
+                                @if (auth()->user()->isLineManager() || auth()->user()->isHrAdmin() || auth()->user()->isSuperAdmin())
                                     <li><a class="dropdown-item" href="{{ route('objectives.team') }}"><i
                                                 class="fas fa-users-cog me-2"></i>Team Objectives</a></li>
                                     <li><a class="dropdown-item" href="{{ route('objectives.approvals') }}"><i
@@ -55,7 +55,7 @@
                                     <li><a class="dropdown-item"
                                             href="{{ route('idps.index', ['manager_id' => auth()->id()]) }}"><i
                                                 class="fas fa-graduation-cap me-2"></i>Team IDPs</a></li>
-                                @endcan
+                                @endif
 
                                 @can('viewAny', App\Models\Objective::class)
                                     <li><a class="dropdown-item" href="{{ route('objectives.department') }}"><i

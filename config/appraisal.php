@@ -15,6 +15,9 @@ return [
     'individual_min' => 3,
     'individual_max' => 6,
 
+    // Individual objective total weightage required
+    'individual_total' => 70,
+
     // Scoring thresholds (percent)
     'min_individual_threshold' => 50.0,
     'outstanding_individual_threshold' => 80.0,

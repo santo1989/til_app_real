@@ -28,8 +28,9 @@ class YearEndFlowTest extends TestCase
             'is_active' => true,
         ]);
 
-        // Create a line manager (the actor)
+        // Create a line manager and a super admin (actor)
         $manager = User::factory()->create(['role' => 'line_manager']);
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
 
         // Employee 1: low scores -> expect PIP and rating normalized to 'below'
         $employee1 = User::factory()->create(['role' => 'employee', 'line_manager_id' => $manager->id]);
@@ -40,7 +41,7 @@ class YearEndFlowTest extends TestCase
         $o3 = Objective::create(['user_id' => $employee1->id, 'type' => 'individual', 'description' => 'Obj 3', 'weightage' => 33, 'financial_year' => $fy->label, 'created_by' => $manager->id]);
 
         // Submit low achievement scores (50% each) -> total below 60
-        $this->actingAs($manager)
+        $response = $this->actingAs($superAdmin)
             ->post(route('appraisals.conduct_yearend.submit', ['user_id' => $employee1->id]), [
                 'achievements' => [
                     ['id' => $o1->id, 'score' => 50, 'rating' => 0],
@@ -49,6 +50,7 @@ class YearEndFlowTest extends TestCase
                 ],
                 'supervisor_comments' => 'Low performance',
             ]);
+        $response->assertSessionHasNoErrors();
 
         $appraisal1 = Appraisal::where('user_id', $employee1->id)->where('financial_year', $fy->label)->first();
         $this->assertNotNull($appraisal1, 'Appraisal should be created for employee1');
@@ -63,7 +65,7 @@ class YearEndFlowTest extends TestCase
         $p2 = Objective::create(['user_id' => $employee2->id, 'type' => 'individual', 'description' => 'O2', 'weightage' => 50, 'financial_year' => $fy->label, 'created_by' => $manager->id]);
 
         // Submit high achievement scores (95% each) -> total >=90 and individual >=80 -> Outstanding
-        $this->actingAs($manager)
+        $this->actingAs($superAdmin)
             ->post(route('appraisals.conduct_yearend.submit', ['user_id' => $employee2->id]), [
                 'achievements' => [
                     ['id' => $p1->id, 'score' => 95, 'rating' => 0],
